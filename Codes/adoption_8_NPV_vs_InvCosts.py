@@ -25,7 +25,7 @@ from mesa import Agent, Model #base classes
 from Scheduler_StagedActivation_Random import StagedActivation_random
 from mesa.datacollection import DataCollector #for data collection, of course
 
-
+# =============================================================================
 #SCENARIO SETTING
 
 #scenario = "ZEV" #100MWh criteria for forming communities and also community size limit of 100MWh
@@ -166,6 +166,8 @@ elif scenario == 'laptop_top4':
 # 
 # =============================================================================
 
+# =============================================================================
+# AGENT INFORMATION
 list_agents = list(data.loc[:,'bldg_id'])
 
 list_installed_solar_bldgs_100MWh = ['Z0115','Z1720','Z1721']
@@ -202,6 +204,8 @@ community_formation = pd.DataFrame(data = None)
 global solar_sizes_temp_var
 solar_sizes_temp_var = 0
 
+# =============================================================================
+# SMALL WORLD NETWORK
 def make_swn():
     '''
     to make random groups of small world networks 
@@ -478,7 +482,7 @@ class tpb(Model):
         step_ctr += 1
         #print("Step counter = ", step_ctr)
     
-#%% MORE FUNCTIONS 
+#%% MORE FUNCTIONS for agent attributes and also for outputs of ABM segregated by agent types
 def agent_type_res(model):
     '''
     to find total number of RESIDENTIAL individual adoptions
@@ -737,7 +741,7 @@ def check_neighbours_subplots(self,uid):
         #print("subplot_effect = ",self.subplot_effect)
     
  
-#%%
+#%% STAGES of the ABM
 
 
 import itertools
@@ -880,6 +884,7 @@ def stage2_decision(self,uid,idea):
             
             #g_df = dataframe to hold which combos can exist and which have positive NPVs
             g_df = pd.DataFrame(data = None,index = range(1))
+            
             #for loop to find which of the combos can actually exist and which have positive NPVs
             for g in names_possible_combos_list:
                 if g in list(Agents_Community_NPVs.columns):
@@ -896,6 +901,7 @@ def stage2_decision(self,uid,idea):
                 max_combo_npv = npvs_list2.idxmax(axis=1) #this is the community with the maximum positive NPV!
                                 
                 #*****NOW COMES THE ACTUAL COMMUNITY FORMATIONS*****
+                
                 #ZEV and no_ZEV scenario - only case where a community formation can be considered
                 if Agents_Community_NPVs.loc[step_ctr][max_combo_npv] > 0 and comm_limit == 1 and Agents_Possibles_Combos.loc[max_combo_npv]['Demand_Year_MWh'] < 100:#) if scen_11 == 1 else True): #extra if is to neglect or consider community sizes
                     #if the npv is greater than 0 and if the demand sum of the buildings is less than 100 MWh, the self imposed limit

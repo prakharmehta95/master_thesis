@@ -51,13 +51,13 @@ for i in temp_list:
     df_solar[i] = correct_solar[i]
 
 # =============================================================================
-##%% multiply the solar PV data with an efficiency factor to convert to AC
+#%% multiply the solar PV data with an efficiency factor to convert to AC
 #commented out to avoid execution by mistake
 
 df_solar_AC = df_solar*0.97    #multiply by 0.5 to do the 50% reduction
 df_solar_AC_OG = df_solar*0.97
 
-##%% adding hours of the day to the demand and supply dataframes
+#%% adding hours of the day to the demand and supply dataframes
 list_hours = []  
 ctr = 0  
 for i in range(8760):
@@ -109,7 +109,7 @@ for i in range(365):
 df_demand['Day'] = list_days
 df_solar_AC['Day'] = list_days
 
-##%% adding info about HIGH/LOW hours of the day
+#%% adding info about HIGH/LOW hours of the day
 import numpy as np
 df_demand['price_level'] = ""
 df_solar_AC['price_level'] = ""
@@ -122,7 +122,7 @@ df_demand['price_level'] = np.where(np.logical_and(np.logical_and(df_solar_AC['H
 
 
 
-##%% PV System Price Projections
+#%% PV System Price Projections
 '''
 PV PRICES in the next years. Base PV price data from EnergieSchweiz.
 Projections Source = IEA Technology Roadmap 2014
@@ -147,7 +147,7 @@ for i in list(PV_price_baseline.columns):
         
         
         
-#3%% Preparation for NPV Calculation - savings and costs estimations
+#%% Preparation for NPV Calculation - savings and costs estimations
 """        
 PV output reduces every year
 demand remains constant
@@ -194,7 +194,7 @@ for year in range(PV_lifetime):
         list_om_costs.append(OM_costs)
     Agents_OM_Costs[col_name] = list_om_costs
 #---------------------
-#%%
+
 for year in range(PV_lifetime):
     col_name = 'Year' + str(year)
     list_savings = []
@@ -303,7 +303,7 @@ Agents_NetSavings = Agents_Savings - Agents_OM_Costs - Agents_EWZ_Costs
 
 
 
-#% NPV Calculation
+#%% NPV Calculation
 '''
 small PV = < 100kW (medium is betwwen 30 and 100)
 large PV = >= 100kW
@@ -449,7 +449,7 @@ for i in agent_list_final:#['Z0003','Z0004']: #put agent_list_final here later
     
 
 
-##%% writing data to pickle
+#%% writing data to pickle
 #os.chdir(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB')
 
 Agents_NPVs.to_pickle('Agents_IND_wholesale_nosubsidy_NPVs_Years.pickle')

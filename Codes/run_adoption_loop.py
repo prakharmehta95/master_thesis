@@ -2,14 +2,7 @@
 """
 Created on Wed May  8 18:23:37 2019
 
-@author: iA
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Mar 26 16:50:15 2019
-
-@author: iA
+@author: Prakhar Mehta
 """
 
 """

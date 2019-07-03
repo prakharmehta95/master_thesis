@@ -2,14 +2,15 @@
 """
 Created on Thu Apr 25 11:44:12 2019
 
-@author: prakh
+@author: Prakhar Mehta
 """
-agents_all_list =  pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\test_agents_ALL.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
 import networkx as nx
 import pandas as pd
 from random import seed
 import random
 import numpy as np
+
+agents_all_list =  pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\test_agents_ALL.xlsx') #all agents 
 
 watts_strogatz = nx.watts_strogatz_graph(100,2,0.5)
 nx.nodes(watts_strogatz)

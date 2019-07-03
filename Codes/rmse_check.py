@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_squared_error
 from math import sqrt
 #%%
+# hist_proj 		- projections for Model B - all of Wiedikon
+# hist_proj_noZEV 	- projections for Model A
 
 hist_proj = [827,1654,2481,3308,4135]#,4962,5790,6617,7444,8271,9098,9925,10752,11580,12407,13234,14061,14888]
 #hist_proj_noZEV = [226,452,679,905,1132]#,1358,1585,1811,2038,2264,2490,2717,2943,3170,3396,3623,3849,4076]
