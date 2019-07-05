@@ -2,7 +2,7 @@
 """
 Created on Thu Apr  4 17:58:04 2019
 
-@author: iA
+@author: Prakhar Mehta
 """
 
 #%%
@@ -30,25 +30,21 @@ from mesa.datacollection import DataCollector #for data collection, of course
 
 #scenario = "ZEV" #100MWh criteria for forming communities and also community size limit of 100MWh
 #scenario = "no_ZEV"
-scenario = "TOP4_no100MWh"
+scenario = "TOP4_no100MWh_retail"
+#scenario = "TOP4_no100MWh_wholesale"
 #scenario = 2 #no 100MWh criteria but max 4 neighbours considered in forming the communities
 #scenario = 'laptop_top4'
 
 print(scenario)
-
     
 if scenario == "ZEV":
     '''
-    100% size, 100 MWh Restriction, 100 MWh Community Restriction
+    100% size, 100 MWh Restriction on buildings, 100 MWh Community Restriction
     '''
-    #---------setting up on the iA computer WITH OLD ORIGINAL PV SIZES---------
     #INFORMATION on agents and all combinations
-    #data = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_OLD_PV_Sizes.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
-    data = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_lessthan100MWh_100%PV.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
-    Agents_Possibles_Combos = pd.read_pickle('Duplicate_Combinations_All_Info_commIDs.pickle')
+    data = pd.read_excel(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_lessthan100MWh_100%PV.xlsx')
     
     #list of all possible subplots i.e. neighbours to form a community with
-    #global subplots_final
     subplots_final = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\subplots_CLEAN_100MWh.xlsx') 
     
     #profitability index for individual agents
@@ -60,21 +56,19 @@ if scenario == "ZEV":
     Agents_Ind_SCRs = pd.read_pickle('Agents_IND_nosubsidy_SCR_Years.pickle')
     Agents_Community_SCRs = pd.read_pickle('Duplicate_Combos_nosubsidy_Agents_SCRs_Years.pickle')
     Agents_Ind_Investments = pd.read_pickle('Agents_IND_nosubsidy_InvestmentCosts_Years.pickle')
-    ZEV = 1 #binary variable to turn on/off whether to have ZEV/no ZEV
-    comm_limit = 1 #limit of 100 MWh for community size applies
+    
+    ZEV = 1             #binary variable to turn on/off whether to have ZEV/no ZEV
+    comm_limit = 1      #limit of 100 MWh for community size applies
     
 elif scenario == "no_ZEV":
     '''
     100% size, 100 MWh Restriction, Communities cannot be formed
     '''
-    #---------setting up on the iA computer WITH OLD ORIGINAL PV SIZES---------
     #INFORMATION on agents and all combinations
-    #data = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_OLD_PV_Sizes.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
-    data = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_lessthan100MWh_100%PV.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
+    data = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_lessthan100MWh_100%PV.xlsx')
     Agents_Possibles_Combos = pd.read_pickle('Duplicate_Combinations_All_Info_commIDs.pickle')
     
     #list of all possible subplots i.e. neighbours to form a community with
-    #global subplots_final
     subplots_final = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\subplots_CLEAN_100MWh.xlsx') 
     
     #profitability index for individual agents
@@ -89,7 +83,7 @@ elif scenario == "no_ZEV":
     ZEV = 0 #community can't even be formed
     comm_limit = 1 #just to be consistent with code, this won't be used as ZEV = 0 for this scenario
 
-elif scenario == "TOP4_no100MWh":
+elif scenario == "TOP4_no100MWh_retail":
     '''
     100% size, no 100 MWh Restriction BUT max 4 neighbours to form a community with
     '''
@@ -99,8 +93,8 @@ elif scenario == "TOP4_no100MWh":
     Agents_Possibles_Combos = pd.read_pickle('Duplicate_Combinations_TOP4_All_Info_commIDs.pickle')
     Agents_Possibles_Combos = Agents_Possibles_Combos.rename(index=str, columns={"Unnamed: 0": "Name_Comm",})
     Agents_Possibles_Combos = Agents_Possibles_Combos.set_index('Name_Comm')
+    
     #list of all possible subplots i.e. neighbours to form a community with
-    #global subplots_final
     subplots_final = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\subplots_CLEAN_100MWh_TOP4.xlsx') 
     
     #profitability index for individual agents
@@ -113,58 +107,37 @@ elif scenario == "TOP4_no100MWh":
     Agents_Community_SCRs = pd.read_pickle('Duplicate_Combos_TOP4_nosubsidy_Agents_SCRs.pickle')
     Agents_Ind_Investments = pd.read_pickle('Agents_IND_nosubsidy_InvestmentCosts_Years.pickle')
     
-    #wholesale
-    #Agents_Community_NPVs = pd.read_pickle('Duplicate_Combos_TOP4_wholesale_nosubsidy_Agents_NPVs_Years.pickle')
-    #Agents_Ind_NPVs = pd.read_pickle('Agents_IND_wholesale_nosubsidy_NPVs_Years.pickle')
-    #profitability_index = pd.read_pickle(r"C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Profitability_Index_SCALED_wholesale.pickle")
+    ZEV = 1 # communities can be formed
+    comm_limit = 0 #no 100 MWh limit for community size
     
+elif scenario == "TOP4_no100MWh_wholesale":
+    '''
+    100% size, no 100 MWh Restriction BUT max 4 neighbours to form a community with. WHOLESALE prices
+    '''
+    
+    #INFORMATION on agents and all combinations
+    data = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_No_100MWh_Restriction.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
+    Agents_Possibles_Combos = pd.read_pickle('Duplicate_Combinations_TOP4_All_Info_commIDs.pickle')
+    Agents_Possibles_Combos = Agents_Possibles_Combos.rename(index=str, columns={"Unnamed: 0": "Name_Comm",})
+    Agents_Possibles_Combos = Agents_Possibles_Combos.set_index('Name_Comm')
+    
+    #list of all possible subplots i.e. neighbours to form a community with
+    subplots_final = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\subplots_CLEAN_100MWh_TOP4.xlsx') 
+    
+    #profitability index for individual agents
+    profitability_index = pd.read_pickle(r"C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Profitability_Index_SCALED_wholesale.pickle")
+       
+    #NPV information
+    Agents_Ind_NPVs = pd.read_pickle('Agents_IND_wholesale_nosubsidy_NPVs_Years.pickle')
+    Agents_Community_NPVs = pd.read_pickle('Duplicate_Combos_TOP4_wholesale_nosubsidy_Agents_NPVs_Years.pickle')
+    Agents_Ind_SCRs = pd.read_pickle('Agents_IND_nosubsidy_SCR_Years.pickle')
+    Agents_Community_SCRs = pd.read_pickle('Duplicate_Combos_TOP4_nosubsidy_Agents_SCRs.pickle')
+    Agents_Ind_Investments = pd.read_pickle('Agents_IND_nosubsidy_InvestmentCosts_Years.pickle')
     
     ZEV = 1 # communities can be formed
     comm_limit = 0 #no 100 MWh limit for community size
     
-elif scenario == 'laptop_top4':
-    '''
-    100% size, no 100 MWh Restriction BUT max 4 neighbours to form a community with
-    '''
-    
-    #---------setting up on the laptop WITH OLD ORIGINAL PV SIZES---------
-    #INFORMATION on agents and all combinations
-    data = pd.read_excel (r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_No_100MWh_Restriction.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
-    Agents_Possibles_Combos = pd.read_pickle('Duplicate_Combinations_TOP4_All_Info_commIDs.pickle')
-    Agents_Possibles_Combos = Agents_Possibles_Combos.rename(index=str, columns={"Unnamed: 0": "Name_Comm",})
-    Agents_Possibles_Combos = Agents_Possibles_Combos.set_index('Name_Comm')
-    #list of all possible subplots i.e. neighbours to form a community with
-    #global subplots_final
-    subplots_final = pd.read_excel (r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\subplots_CLEAN_100MWh_TOP4.xlsx') 
-    
-    #profitability index for individual agents
-    profitability_index = pd.read_pickle(r"C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Profitability_Index_Scaled.pickle")
-    
-    #NPV information
-    Agents_Ind_NPVs = pd.read_pickle('Agents_IND_nosubsidy_NPVs_Years.pickle')
-    Agents_Community_NPVs = pd.read_pickle('Duplicate_Combos_TOP4_nosubsidy_Agents_NPVs_Years.pickle')
-    
 
-
-# =============================================================================
-# WILL NEED MORE CHANGES FOR THE SCENARIOS to run on the laptop
-# #---------setting up on Prakhar's laptop---------
-# #INFORMATION on agents and all combinations
-# data = pd.read_excel (r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
-# Agents_Possibles_Combos = pd.read_pickle('Duplicate_Combinations_All_Info_commIDs.pickle')
-# 
-# #list of all possible subplots i.e. neighbours to form a community with
-# global subplots_final
-# subplots_final = pd.read_excel (r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\subplots_CLEAN_100MWh.xlsx') 
-# 
-# #profitability index for individual agents
-# profitability_index = pd.read_pickle(r"C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Profitability_Index_Scaled.pickle")
-# 
-# #NPV information
-# Agents_Ind_NPVs = pd.read_pickle('Agents_IND_nosubsidy_NPVs_Years.pickle')
-# Agents_Community_NPVs = pd.read_pickle('Duplicate_Combos_nosubsidy_Agents_NPVs_Years.pickle')
-# 
-# =============================================================================
 
 # =============================================================================
 # AGENT INFORMATION
@@ -192,17 +165,7 @@ agents_info['En_Champ'] = 0         #saves who is the energy champion of that co
 agents_info['Year'] = 0             #saves year of adoption
 
 agents_subplots = subplots_final
-#Agents_Possibles_Combos['Adopt'] = 0 #saves 1 if COMMUNITY adoption occurs, else stays 0
-#Agents_Possibles_Combos['Year'] = 0  #saves year of adoption
 
-#not being used as of now
-community_formation = pd.DataFrame(data = None) 
-
-#solar_sizes_adopted = pd.DataFrame(data = None, columns = ['Year1','Year2','Year3','Year4'])
-
-#check if this is needed - I think I am not using it as on 10 May version
-global solar_sizes_temp_var
-solar_sizes_temp_var = 0
 
 # =============================================================================
 # SMALL WORLD NETWORK
@@ -233,7 +196,7 @@ def make_swn():
         swn = pd.DataFrame(data = None) #holds all swns for all agents
         swn = temp_df
     
-    elif scenario == "TOP4_no100MWh":
+    elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
         G = nx.watts_strogatz_graph(1437,10,0.5,2)#swn function with 10 closest peers - Dunbar number?? Other REF?
         for i in range(1437):
             #print(i)
@@ -752,67 +715,73 @@ def stage1_intention(self, uid, attitude, pp,ratio,subplot_effect):
     Considers the environmental attitude, payback period ratio and the swn_ratio
     Final intention at the end of every step saved as self.intention
     """
-    
-    if self.dem_total < 100000000000:# and self.egids == 1:# and self.pv_size < 10000001:# and self.part_comm == 1:
-        #weights and thresholds for the intention function
-        w_econ = 1/3
-        w_swn = 1/3
-        w_att = 1/3 #this needs to be varied for the sensitivity analysis
+
+
+    #weights and thresholds for the intention function
+    if scenario == "ZEV" or scenario == "no_ZEV":
+        w_econ = 0.30
+        w_swn = 0.31
+        w_att = 0.39
         w_subplot = 0.1
         threshold = 0.5
+    elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
+        w_econ = 0.33
+        w_swn = 0.42
+        w_att = 0.25 
+        w_subplot = 0.1
+        threshold = 0.5
+    
+    
+    #the basic intention function:
+    total = w_att*attitude + w_econ*pp + w_swn*ratio + w_subplot*subplot_effect
+    self.total = total
+    
+    if scenario == "ZEV" or scenario == "no_ZEV":
+        if self.unique_id in list_installed_solar_bldgs_100MWh:
+            print(self.unique_id)
+            total = 1
+            self.total = total
+            self.intention = 1
+    elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
+        if self.unique_id in list_installed_solar_bldgs_ALL:
+            print(self.unique_id)
+            total = 1
+            self.total = total
+            self.intention = 1
         
-        #the basic intention function:
-        total = w_att*attitude + w_econ*pp + w_swn*ratio + w_subplot*subplot_effect
-        #print(total)
-        self.total = total
         
-        if scenario == "ZEV" or scenario == "no_ZEV":
-            if self.unique_id in list_installed_solar_bldgs_100MWh:
-                print(self.unique_id)
-                total = 1
-                self.total = total
-                self.intention = 1
-        elif scenario == "TOP4_no100MWh":
-            if self.unique_id in list_installed_solar_bldgs_ALL:
-                print(self.unique_id)
-                total = 1
-                self.total = total
-                self.intention = 1
-            
-            
-        if total > threshold:
-            intention = 1
-            #agents_info.update(pd.Series([intention], name  = 'intention', index = [uid]))
-            #agents_info.loc[uid]['Solar'] = solar
-            self.counter = self.counter + 1
-            self.intention = intention
-            self.intention_yr = intention
-            #return self.intention
-        else:
-            intention = 0
-            #agents_info.update(pd.Series([intention], name  = 'intention', index = [uid]))
-            #agents_info.loc[uid]['Solar'] = solar
-            self.intention = intention
-            self.intention_yr = intention
-            #agents_all_list.update(pd.Series([intention], name = 'Adoption Decision', index = [uid]))
-            #return self.intention
-            if step_ctr == 17:
-                agents_info.update(pd.Series([0], name  = 'Adopt_IND', index = [self.unique_id]))
-                agents_info.update(pd.Series([self.total], name  = 'intention', index = [self.unique_id]))
-                #agents_info.update(pd.Series([ind_npv], name  = 'Ind_NPV', index = [self.unique_id]))
-                agents_info.update(pd.Series(["Intention<threshold"], name  = 'Reason', index = [self.unique_id]))
+    if total > threshold:
+        intention = 1
+        self.counter = self.counter + 1
+        self.intention = intention
+        self.intention_yr = intention
+        
     else:
-        self.intention = 0
+        intention = 0
+        self.intention = intention
+        self.intention_yr = intention
+        #since in the last year if the intention is not 1, stage 2 will not be entered. Results won't be written, hence write them here.
+        if step_ctr == 17:
+            agents_info.update(pd.Series([0], name  = 'Adopt_IND', index = [self.unique_id]))
+            agents_info.update(pd.Series([self.total], name  = 'intention', index = [self.unique_id]))
+            agents_info.update(pd.Series(["Intention<threshold"], name  = 'Reason', index = [self.unique_id]))
+
     
 
 def stage2_decision(self,uid,idea):
     """
     Decision made here after passing the intention stage
     """
+    
     #print("STAGE 2 ENTERED...............................................")
-    reduction = -0.0
+    
+    if scenario == "ZEV" or scenario == "no_ZEV":
+        reduction = -0.05    #how much negative NPV as a percentage of investment is allowed. 5% negative NPV allowed after calibration.
+            
+    elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
+        reduction = -0.00    #how much negative NPV as a percentage of investment is allowed. NO NEGATIVE NPV allowed after calibration.
+    
     agents_adopting_community_list = []
-    global solar_sizes_temp_var
     ind_npv = Agents_Ind_NPVs.loc[step_ctr][self.unique_id]
     
     if self.intention == 1 and (self.unique_id not in list_installed_solar_bldgs_ALL):
@@ -827,11 +796,12 @@ def stage2_decision(self,uid,idea):
             WHEN those buildings will be the agents making decisions, then if they have already said yes to a community system,
             then do not do the ranking etc for them, simply skip them... :)
         '''
-        #
+        
+        # to set which building/agent is being considered
         temp_id = self.unique_id
         #find the npv to save it with the agent when he adopts
         
-        #for teh agents which can actually form communities
+        #for the agents which can actually form communities
         if self.part_comm == 1 and ZEV == 1:
             
             hh = []
@@ -839,9 +809,7 @@ def stage2_decision(self,uid,idea):
             for i in range(len(agents_objects_list)):
                 hh.append(agents_objects_list[i].unique_id)
                 hhh.append(agents_objects_list[i].intention_yr)
-                #print(agents_objects_list[i].unique_id)
-                #print(agents_objects_list[i].intention_yr)
-            
+                
             zzz = pd.DataFrame(data = None) #temporary dataframe to hold agent information about intention
             zzz['unique_id'] = hh
             zzz['intention_yr'] = hhh
@@ -1155,7 +1123,7 @@ def stage2_decision(self,uid,idea):
             agents_info.update(pd.Series([self.total], name  = 'intention', index = [self.unique_id]))
             agents_info.update(pd.Series([ind_npv], name  = 'Ind_NPV', index = [self.unique_id]))
             agents_info.update(pd.Series(["Existing"], name  = 'Reason', index = [self.unique_id]))
-    elif scenario == "TOP4_no100MWh":
+    elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
         if self.unique_id in list_installed_solar_bldgs_ALL:
             print(self.unique_id)
             self.adopt_ind = 1
