@@ -1,0 +1,3 @@
+Open Street Map of Zurich downloaded from the OSM plugin in QGIS
+
+CRS: EPSG: 3857 - WGS 84 / Pseudo-Mercator
