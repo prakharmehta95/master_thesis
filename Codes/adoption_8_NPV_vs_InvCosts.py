@@ -12,6 +12,7 @@ Initial libraries and data import
 
 #useful packages to work with
 import random 
+import itertools
 from random import seed
 from random import gauss
 import json        
@@ -34,7 +35,6 @@ scenario = "TOP4_no100MWh_retail"
 #scenario = "TOP4_no100MWh_wholesale"
 #scenario = 2 #no 100MWh criteria but max 4 neighbours considered in forming the communities
 #scenario = 'laptop_top4'
-
 print(scenario)
     
 if scenario == "ZEV":
@@ -143,10 +143,13 @@ elif scenario == "TOP4_no100MWh_wholesale":
 # AGENT INFORMATION
 list_agents = list(data.loc[:,'bldg_id'])
 
-list_installed_solar_bldgs_100MWh = ['Z0115','Z1720','Z1721']
-list_installed_solar_bldgs_ALL = ['Z0115', 'Z0360', 'Z0398', 'Z0401', 'Z0402', 'Z0691', 'Z1565', 'Z1717', 'Z1719', 'Z1720', 'Z1721' ] 
+#initializing a few buildings already installed solar
+list_installed_solar_bldgs_100MWh   = ['Z0115','Z1720','Z1721']
+list_installed_solar_bldgs_ALL      = ['Z0115', 'Z0360', 'Z0398', 'Z0401', 
+                                       'Z0402', 'Z0691', 'Z1565', 'Z1717',
+                                       'Z1719', 'Z1720', 'Z1721' ] 
 
-agents_info = data  #just a copy of original data
+agents_info = data  #just a copy of original data, used to store all information of agents
 agents_info['intention'] = 0
 agents_info['Comm_NPV'] = 0
 agents_info['Ind_NPV'] = 0
@@ -157,7 +160,6 @@ agents_info = agents_info.set_index('bldg_id')
 agents_info['Ind_SCR'] = 0
 agents_info['Comm_SCR'] = 0
 
-#print("agents_info being set")
 agents_info['Adopt_IND'] = 0        #saves 1 if INDIVIDUAL adoption occurs, else stays 0
 agents_info['Adopt_COMM'] = 0       #saves 1 if COMMUNITY  adoption occurs, else stays 0
 agents_info['Community_ID'] = ""    #community ID of the community formed
@@ -172,55 +174,55 @@ agents_subplots = subplots_final
 def make_swn():
     '''
     to make random groups of small world networks 
+    https://networkx.github.io/documentation/networkx-1.9/reference/generated/networkx.generators.random_graphs.watts_strogatz_graph.html
+    
+    watts_strogatz_graph(n, k, p, seed=None)
+    
+    n = 716 for ZEV/no_ZEV scenario; 1437 for TOP4...
+    k = each node is connected to 10 closest peers
+    p = The probability of rewiring each edge, set at 0.5 (in between regular (p = 0.0) and random (p = 1))
+    seed = seed for random number generator. Always fixed at 2!
     '''
     
     temp_df = pd.DataFrame(data = None, index = range(20),columns = range(1437))
     print("make swn called")
-    #I set the seed for the swn in the function! - always fixed!
+    
+    
     if scenario == "ZEV" or scenario == "no_ZEV":
-        G = nx.watts_strogatz_graph(716,10,0.5,2)#swn function with 10 closest peers - Dunbar number?? Other REF?
+        G = nx.watts_strogatz_graph(716,10,0.5,2)       
         for i in range(716):
-            #print(i)
             l = list(G.adj[i])
             if len(l) < 10:
                 for j in range(10-len(l)):
                     l.append(np.nan)
-            #temp_df[i] = ""
             temp_df[i] = pd.Series(list(G.adj[i]))
         
-        swn_ref_Z0003 = pd.read_csv('SWN_List_less_100MWh.csv')#key of changing numbers to building names/IDs
-        
-        #dictionary to replace numbers of the watts-stratogatz function with actual building names
-        di = swn_ref_Z0003.Circular_List.to_dict()
+        swn_ref_Z0003 = pd.read_csv('SWN_List_less_100MWh.csv') #key of changing numbers to building names/IDs
+        di = swn_ref_Z0003.Circular_List.to_dict()              #dictionary to replace numbers of the watts-stratogatz function with actual building names
         temp_df = temp_df.rename(columns = di)
-        swn = pd.DataFrame(data = None) #holds all swns for all agents
+        swn = pd.DataFrame(data = None)                         #holds all swns for all agents
         swn = temp_df
     
     elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
-        G = nx.watts_strogatz_graph(1437,10,0.5,2)#swn function with 10 closest peers - Dunbar number?? Other REF?
+        G = nx.watts_strogatz_graph(1437,10,0.5,2)
         for i in range(1437):
-            #print(i)
             l = list(G.adj[i])
             if len(l) < 10:
                 for j in range(10-len(l)):
                     l.append(np.nan)
-            #temp_df[i] = ""
             temp_df[i] = pd.Series(list(G.adj[i]))
         
-        swn_ref_Z0003 = pd.read_csv('SWN_List.csv')#key of changing numbers to building names/IDs
-        
-        #dictionary to replace numbers of the watts-stratogatz function with actual building names
-        di = swn_ref_Z0003.Circular_List.to_dict()
+        swn_ref_Z0003 = pd.read_csv('SWN_List.csv')             #key of changing numbers to building names/IDs
+        di = swn_ref_Z0003.Circular_List.to_dict()              #dictionary to replace numbers of the watts-stratogatz function with actual building names
         temp_df = temp_df.rename(columns = di)
-        swn = pd.DataFrame(data = None) #holds all swns for all agents
+        swn = pd.DataFrame(data = None)                         #holds all swns for all agents
         swn = temp_df
     
     for i in swn.columns:
         swn[i] = temp_df[i].map(di)
     return swn
 
-
-agents_peers = make_swn()
+agents_peers = make_swn()                                       #calls swn function
 
 
 
@@ -249,7 +251,6 @@ class tpb_agent(Agent):
             unique_id   = Agent unique identification (Z0000, Z0001,...)
             bldg_type   = Type of the building 
             attitude    = Environmental attitude [0,1]
-            network     = all other agents in their small world network --> MAYBE DO NOT NEED THIS
             pp          = payback period ratio - indicator of economic attractiveness [0,1]
             intention   = initial idea to adopt/not adopt solar: BOOLEAN 0|1
             swn_ratio   = ratio of people in small world network who install solar [0,1]
@@ -258,8 +259,6 @@ class tpb_agent(Agent):
                             also - if 0 or >1, then do not count in subplot effects!
             adopt_ind   = if agent adopts individual system BOOLEAN 0|1
             adopt_comm  = if agent adopts community system BOOLEAN 0|1
-            ind_size    = 
-            comm_size   =
             en_champ    = if this agent is the energy champion or nor 
         
         '''
@@ -269,14 +268,12 @@ class tpb_agent(Agent):
         
         self.bldg_type = bldg_type
         self.attitude = attitude
-        #self.network = network
-        #hhh = econ_attr
-        self.pp = econ_attr(self)#pp#hhh#econ_attr#pp
-        self.intention = intention
-        self.intention_yr = intention
+        self.pp = econ_attr(self)               #calls the economic attractiveness function to assign the profitability index to each agent
+        self.intention = intention              #stores the intention of the agent (whether or not it passed idea stage)
+        self.intention_yr = intention_yr        #stores the intention of the agent every year of the simulation
         self.swn_ratio = swn_ratio
-        self.subplot_effect = subplot_effect
-        self.total = total
+        self.subplot_effect = subplot_effect    #stores the subplot_effect, called with the 'check_neighbours_subplots' function
+        self.total = total                      #sum of the intention function
         self.counter = counter
         self.adopt_ind = adopt_ind
         self.adopt_comm = adopt_comm
@@ -288,16 +285,7 @@ class tpb_agent(Agent):
         self.egids = egids
         
           
-        #check_peers(self,self.unique_id) #need to write an initial check_peers function.MAYBE NOT NEEDED AT ALL
-        
-        #to calculate the intention at the START of the program. THIS can be based on any of the 3 agent variables
-        #maybe best to randomly assign solar decision to a few buildings at the start, irrespective of variables?
-        #OR, could assign to some buildings which are high on environmental attitude
-        #AS OF NOW, DONE WITH THE CURRENT INTENTION FUNCTION
-        # done because - initialize some buildings as having solar
-        #OKAY - BUT NEED ANOTHER INITIALIZATION FUNCTION. IF I USE THIS IT FUCKS UP THE OTHER PARTS OF THE CODE
-        #stage1_intention(self,self.unique_id, self.attitude,self.pp,self.swn_ratio)
-        
+               
     def step_idea(self):
         '''
         defines what the agent does in his step.
@@ -307,43 +295,29 @@ class tpb_agent(Agent):
         
         # only run the step_idea if agent has not already adopted!
         if self.adopt_comm == 1 or self.adopt_ind == 1:
-            self.intention = 0#do it again to be safe
+            self.intention = 0                          #do it again to be safe - so that an agent which adopted is out of the simulation
         else:
-            #only  call the intention calculation if solar has not been installed
-            #print("*")
             #print("start of new agent uid = ",self.unique_id, "has intention = ",self.intention)
             calling_list.append(self.unique_id)
-            check_peers(self,self.unique_id)
-            check_neighbours_subplots(self,self.unique_id)
+            check_peers(self,self.unique_id)                            #sets the swn_ratio
+            check_neighbours_subplots(self,self.unique_id)              #sets the subplot effect attribute
             self.pp = econ_attr(self)
-            #to update the attitude
-            #self.attitude = env_attitude(self, self.unique_id, self.attitude) #to update the environmental attitude
+            
+            #call the intention function
             stage1_intention(self,self.unique_id, self.attitude,self.pp,self.swn_ratio,self.subplot_effect)
-            #check_peers(self,self.unique_id)
-            #print(agents_all_list)
-            #print("Updated attitude is: ", self.attitude)
-            #print("intention for", self.unique_id, "is: ", self.intention)
-            #print("counter   for",self.unique_id, "is: ", self.counter)
-            #print(step_ctr)
-            #print("****")
-        
-        
-    def step_decision(self):
+            
+   def step_decision(self):
         """
         After developing the intention in the step_idea, agents make the final
-        decision in this method.
-        The NPV ranking scheme is also called from this one
+        decision in this step.
         """
-        #stage1_intention(self,self.unique_id, self.attitude,self.pp,self.swn_ratio)
-        #decision_making(self):
-        
         #only those agents whose intention is HIGH can go to decision making
-        if self.intention == 1:# and self.counter == 1:
+        if self.intention == 1:
             global r
             r = 0
-            #print("step_decision")
+            #call the decision making function i.e. stage 2 of the ABM simulation
             stage2_decision(self,self.unique_id,self.intention)
-            #print("Solar at end of year",step_ctr," is = ",temp_solar_num)
+            
         
 #%% MODEL code
         
@@ -353,44 +327,39 @@ class tpb(Model):
     Model setup. The main ABM runs from here.
     Called the FIRST time when the execution happens. Agents are initiated
     '''    
-    #ORIGINAL
-    #global agents_objects_list
-    #agents_objects_list = [] #list of initialized agents
     global list_datacollector
     list_datacollector = []
     calling_list = []
     c = 0
-    #step_ctr = 0
+    
     
     def __init__(self,N,randomseed):
         print("--TPB MODEL CALLED--")
-        agents_info['Adopt_IND'] = 0        #saves 1 if INDIVIDUAL adoption occurs, else stays 0
-        agents_info['Adopt_COMM'] = 0       #saves 1 if COMMUNITY  adoption occurs, else stays 0
-        agents_info['Community_ID'] = ""    #community ID of the community formed
+        agents_info['Adopt_IND'] = 0            #saves 1 if INDIVIDUAL adoption occurs, else stays 0
+        agents_info['Adopt_COMM'] = 0           #saves 1 if COMMUNITY  adoption occurs, else stays 0
+        agents_info['Community_ID'] = ""        #community ID of the community formed
         agents_info['Year'] = 0
-        Agents_Possibles_Combos['Adopt'] = 0 #saves 1 if COMMUNITY adoption occurs, else stays 0
-        Agents_Possibles_Combos['Year'] = 0  #saves year of adoption
+        Agents_Possibles_Combos['Adopt'] = 0    #saves 1 if COMMUNITY adoption occurs, else stays 0
+        Agents_Possibles_Combos['Year'] = 0     #saves year of adoption
 
         
         super().__init__()
         self.num_agents = N
         self.randomseed = randomseed
-        #self.schedule = RandomActivation(self) 
-        #self.schedule = SimultaneousActivation(self) 
         self.schedule = StagedActivation_random(self,stage_list = ['step_idea','step_decision'],
                                              shuffle = True, shuffle_between_stages = True,seed = self.randomseed) 
         #only called once so the seed is the same, meaning the agents are shuffled the same way every time
-        #print(list2)
-        #NEW agent object list declaration
+        
+        
         global agents_objects_list
-        agents_objects_list = [] #list of initialized agents
+        agents_objects_list = []            #list of initialized agents
         
         
         global norm_dist_env_attitude_list
         global step_ctr
         step_ctr = 0
         global i
-        for i in list_agents:#['Z0003','Z0004','Z0054','Z0055','Z0056','Z1987']:#list_agents:          #range(len(agents_info)):
+        for i in list_agents:
             
             global c#, intention
             intention = 0
@@ -436,16 +405,17 @@ class tpb(Model):
         
         
     def step(self):
-        #self.datacollector.collect(self)
+        
         self.schedule.step()
-        self.datacollector.collect(self) #collects data at the end of the step/year
+        self.datacollector.collect(self)        #collects data at the end of the step/year
         
-        global step_ctr #so that I have counter used to change attribures based on the year
-        
+        global step_ctr                         #Counter for the year of the simulation. Used to change agent attributes based on the year
         step_ctr += 1
-        #print("Step counter = ", step_ctr)
+        
     
+
 #%% MORE FUNCTIONS for agent attributes and also for outputs of ABM segregated by agent types
+
 def agent_type_res(model):
     '''
     to find total number of RESIDENTIAL individual adoptions
@@ -532,60 +502,48 @@ def cumulate_solar_ind(model):
     """
     To find the cumulative INDIVIDUAL installations at the end of every time step
     """
-    #print("Cumulate Solar entered%%%%%%%%%%%%%%%%%")
     solar_sum_ind = 0
     for i in model.schedule.agents:
         solar_sum_ind = solar_sum_ind + i.adopt_ind
-    #print("solar sum = ",solar_sum_ind,"~~~~~~~~~~~~~")
-    #print(i)
     return solar_sum_ind
         
 def cumulate_solar_comm(model):
     """
     To find the cumulative COMMUNITY "ALL buildings with installations" at the end of every time step
     """
-    #print("Cumulate Solar entered%%%%%%%%%%%%%%%%%")
     solar_sum_comm = 0
     for i in model.schedule.agents:
         solar_sum_comm = solar_sum_comm + i.adopt_comm
-    #print("solar sum = ",solar_sum_comm,"~~~~~~~~~~~~~")
     return solar_sum_comm  
 
 def cumulate_solar_champions(model):
     """
     To find the cumulative COMMUNITY installations at the end of every time step
     """
-    #print("Cumulate Solar entered%%%%%%%%%%%%%%%%%")
     solar_sum_champ = 0
     for i in model.schedule.agents:
         solar_sum_champ = solar_sum_champ + i.en_champ
-    #print("solar sum = ",solar_sum_champ,"~~~~~~~~~~~~~")
     return solar_sum_champ        
 
 def cumulate_solar_ind_sizes(model):
     """
     To find the cumulative COMMUNITY solar capacity at the end of every time step
     """
-    #print("Cumulate Solar entered%%%%%%%%%%%%%%%%%")
     solar_sum_sizes = 0
     
     for i in model.schedule.agents:
         if i.adopt_ind == 1:
             solar_sum_sizes = solar_sum_sizes + i.pv_size
-    #print("solar sum = ",solar_sum_sizes,"~~~~~~~~~~~~~")
     return solar_sum_sizes
  
 def cumulate_solar_comm_sizes(model):
     """
     To find the cumulative COMMUNITY solar capacity at the end of every time step
     """
-    #print("Cumulate Solar entered%%%%%%%%%%%%%%%%%")
-    
     solar_comm_sizes = 0
     for i in model.schedule.agents:
         if i.adopt_comm == 1:
             solar_comm_sizes = solar_comm_sizes + i.pv_size
-    #print("solar sum = ",solar_comm_sizes,"~~~~~~~~~~~~~")
     return solar_comm_sizes
 
 
@@ -595,8 +553,6 @@ def env_attitude(uid):#(self, uid, attitude):
     NOT TO BE CHANGED IN MODEL v1.0!
     """
     uid = uid
-    
-    #if minergie building then set env attitude high by default
     if agents_info.loc[uid]['MINERGIE'] == 1:
         value = 0.95
     else:
@@ -609,10 +565,8 @@ def env_attitude(uid):#(self, uid, attitude):
 def econ_attr(self):
     """
     To update the payback ratio every step
-    Takes data from a base excel?
-    Enter the source of that excel
+    Takes data from the profitability_index pickle
     """
-    #print(step_ctr)
     uid = self.unique_id
     try:
         self.pp = profitability_index.loc[step_ctr][uid]
@@ -626,19 +580,15 @@ def econ_attr(self):
 
 def check_peers(self,uid):
     """
-    Checks how many other agents in the -SWN- have installed solar
+    Checks how many other agents (or peers) in the SWN have installed solar
     sets agent attribute swn_ratio (self.swn_ratio) accordingly
     
     Uses:
         agents_peers (it is a DataFrame) - list of all people in the SWN of each building
     """
-    #print("*")
-    #print("Check peers called")
     swn_with_solar = 0
-    #print("Initialize swn_with_solar for ",self.unique_id," = ",swn_with_solar)
     temp_list = []
     temp_list = agents_peers[uid].values.tolist() #make a list of all peers of that particular agent with uid
-    #print(temp_list)
     
     """
     Explanation of the for loops coming ahead:
@@ -658,11 +608,10 @@ def check_peers(self,uid):
         for y in range(len(agents_objects_list)): #checking all other agents in the simulation 
             if agents_objects_list[y].unique_id == z:
                 #print("uid of peer = ",agents_objects_list[y].unique_id, "adopted solar = ", agents_objects_list[y].adopt_ind)
-                
                 if agents_objects_list[y].adopt_ind == 1 or agents_objects_list[y].adopt_comm == 1: 
                     swn_with_solar = swn_with_solar + 1
     
-    #print("swn_with_solar = ",swn_with_solar)
+    
     self.swn_ratio = (swn_with_solar/len(agents_peers.loc[:,self.unique_id]))
                      
 def check_neighbours_subplots(self,uid):
@@ -670,7 +619,6 @@ def check_neighbours_subplots(self,uid):
     Checks how many other agents in the --subplot = NEIGHBOURS-- have INTENTION/IDEA of installing solar
     sets agent attribute subplot_effect (self.subplot_effect) accordingly
     **WORKING WITH INTENTION as this is subplot peers**
-    
     Uses:
         agents_subplots (it is a DataFrame) - list of all agents in the subplot of each building
     """
@@ -685,12 +633,12 @@ def check_neighbours_subplots(self,uid):
                     advance subplot_effect_counter.
             Loop runs for all the neighbours which 'uid' has
             
-            THEN - swn_ratio is calculated as:
-                all peers in the swn with solar/all peers in the swn 
+            THEN - subplot_effect is calculated as:
+                all neighbours with positive intention/all neighoburs
         """
         
-        #initialize the counter to 0. This is to see how many of subplot neighbouts in total have intented to adopt solar this year
-        subplot_effect_counter = 0
+        subplot_effect_counter = 0      #initialize the counter to 0. This is to see how many of subplot neighbouts in total have intented to adopt solar this year
+        
         
         for z in temp_list_subplots:
             for y in range(len(agents_objects_list)):
@@ -701,13 +649,13 @@ def check_neighbours_subplots(self,uid):
                         subplot_effect_counter += 1
             
         self.subplot_effect = (subplot_effect_counter/len(temp_list_subplots)) 
-        #print("subplot_effect = ",self.subplot_effect)
+        
     
  
 #%% STAGES of the ABM
 
 
-import itertools
+
 
 def stage1_intention(self, uid, attitude, pp,ratio,subplot_effect):
     """
@@ -719,23 +667,24 @@ def stage1_intention(self, uid, attitude, pp,ratio,subplot_effect):
 
     #weights and thresholds for the intention function
     if scenario == "ZEV" or scenario == "no_ZEV":
-        w_econ = 0.30
-        w_swn = 0.31
-        w_att = 0.39
-        w_subplot = 0.1
-        threshold = 0.5
+        w_econ      = 0.30
+        w_swn       = 0.31
+        w_att       = 0.39
+        w_subplot   = 0.1
+        threshold   = 0.5
     elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
-        w_econ = 0.33
-        w_swn = 0.42
-        w_att = 0.25 
-        w_subplot = 0.1
-        threshold = 0.5
+        w_econ      = 0.33
+        w_swn       = 0.42
+        w_att       = 0.25 
+        w_subplot   = 0.1
+        threshold   = 0.5
     
     
     #the basic intention function:
     total = w_att*attitude + w_econ*pp + w_swn*ratio + w_subplot*subplot_effect
     self.total = total
     
+    #checking for buildings with already installed solar and initializing their intention to 1 regardless of the total
     if scenario == "ZEV" or scenario == "no_ZEV":
         if self.unique_id in list_installed_solar_bldgs_100MWh:
             print(self.unique_id)
@@ -755,12 +704,12 @@ def stage1_intention(self, uid, attitude, pp,ratio,subplot_effect):
         self.counter = self.counter + 1
         self.intention = intention
         self.intention_yr = intention
-        
     else:
         intention = 0
         self.intention = intention
         self.intention_yr = intention
-        #since in the last year if the intention is not 1, stage 2 will not be entered. Results won't be written, hence write them here.
+        
+        #since in the last year if the intention is 0, stage 2 will not be entered. Results won't be written, hence write them here.
         if step_ctr == 17:
             agents_info.update(pd.Series([0], name  = 'Adopt_IND', index = [self.unique_id]))
             agents_info.update(pd.Series([self.total], name  = 'intention', index = [self.unique_id]))
