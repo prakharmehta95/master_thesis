@@ -306,7 +306,7 @@ class tpb_agent(Agent):
             #call the intention function
             stage1_intention(self,self.unique_id, self.attitude,self.pp,self.swn_ratio,self.subplot_effect)
             
-   def step_decision(self):
+    def step_decision(self):
         """
         After developing the intention in the step_idea, agents make the final
         decision in this step.
@@ -753,24 +753,24 @@ def stage2_decision(self,uid,idea):
         #for the agents which can actually form communities
         if self.part_comm == 1 and ZEV == 1:
             
-            hh = []
+            hh = [] #temporary lists
             hhh =[]
             for i in range(len(agents_objects_list)):
                 hh.append(agents_objects_list[i].unique_id)
                 hhh.append(agents_objects_list[i].intention_yr)
                 
-            zzz = pd.DataFrame(data = None) #temporary dataframe to hold agent information about intention
+            zzz = pd.DataFrame(data = None) #temporary dataframe to hold agent information about intention in that year of simulation
             zzz['unique_id'] = hh
             zzz['intention_yr'] = hhh
             zzz.set_index('unique_id')
             
-            all_positive_intention_agents = zzz[zzz['intention_yr'] == 1]
-            list_all_positive_intention_agents = all_positive_intention_agents.unique_id.tolist()
+            all_positive_intention_agents = zzz[zzz['intention_yr'] == 1] #filter out agents with positive intention
+            list_all_positive_intention_agents = all_positive_intention_agents.unique_id.tolist() #create a list of positive intention agents
             pos_intent_comm_members = []
             
-            possible_community_members_all = subplots_final[temp_id].dropna().values.tolist()
+            possible_community_members_all = subplots_final[temp_id].dropna().values.tolist() #list of neighbours who can form a ZEV
             
-            #drop those which have already formed a community!
+            #drop those which have already adopted solar!
             possible_community_members = []
             for k in possible_community_members_all:
                 for j in range(len(agents_objects_list)):
@@ -778,7 +778,7 @@ def stage2_decision(self,uid,idea):
                         if  agents_objects_list[j].adopt_ind == 1 or agents_objects_list[j].adopt_comm == 1:
                             continue #do nothing 
                         elif agents_objects_list[j].adopt_ind == 0 and agents_objects_list[j].adopt_comm == 0:
-                            possible_community_members.append(k)
+                            possible_community_members.append(k) #if not adopted already, put in a list
            
             for k in possible_community_members:
                 if k in list_all_positive_intention_agents:
@@ -794,13 +794,13 @@ def stage2_decision(self,uid,idea):
                 
                 for k in range(len(temp_pos_combos_list)):
                     for m in temp_pos_combos_list[k]:
-                        temp_name = temp_id #take name of building here
+                        temp_name = temp_id #take name of building in consideration here, example = 'Z0054'
                         for n in m:
                             temp_name = temp_name + '_' +n
-                        names_possible_combos_list.append(temp_name) #all possible combos which can be formed this year
+                        names_possible_combos_list.append(temp_name) #all possible combos which can be formed this year. Example: ''Z0054_Z0055' 
             
-            #g_df = dataframe to hold which combos can exist and which have positive NPVs
-            g_df = pd.DataFrame(data = None,index = range(1))
+            
+            g_df = pd.DataFrame(data = None,index = range(1)) #dataframe to hold which combos can exist and which have positive NPVs
             
             #for loop to find which of the combos can actually exist and which have positive NPVs
             for g in names_possible_combos_list:

@@ -142,7 +142,7 @@ Separate the high and low hours of the year as prices are different, and then ca
 """
 
 print("Prep for NPV Calculation")
-Combos_Info = pd.read_pickle('Duplicate_Combinations_TOP4_All_Info.pickle') #new one for 50% reduced PV system sizes
+Combos_Info = pd.read_pickle('Duplicate_Combinations_TOP4_All_Info.pickle') 
 #dataframes to filter high and low times
 df_HIGH = pd.DataFrame(data = None)        
 df_LOW = pd.DataFrame(data = None)        

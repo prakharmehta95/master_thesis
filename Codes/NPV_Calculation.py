@@ -18,15 +18,10 @@ agent_list_final = pd.read_excel(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data
 
 agent_list_final = list(agent_list_final.Bldg_IDs)
 df_solar = pd.DataFrame(data = None)
-#os.chdir('C:/Users/iA/Desktop/New folder_(3)')
-#for FileList in glob.glob('*.csv'):
 for FileList in agent_list_final:
     print(FileList)
     #path = r."C:\\Users\\iA\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\solar\\"
-    z = pd.read_csv(r"C:\\Users\\prakh\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\solar\\" + FileList + '_PV.csv')
-    #df[FileList] = ""
-     #df.add(other = z.E_PV_gen_kWh,axis = 'index')
-     #df.add()
+    z = pd.read_csv(r"C:\\Users\\iA\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\solar\\" + FileList + '_PV.csv')
     df_solar[FileList] = ""
     df_solar[FileList] = z.E_PV_gen_kWh
  
@@ -35,15 +30,12 @@ for FileList in agent_list_final:
 df_demand = pd.DataFrame(data = None)
 for FileList in agent_list_final:
     print(FileList)
-    zz = pd.read_csv(r"C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\CEA Data\Sample 1650\outputs\data\demand\\" + FileList + '.csv')
-    #df[FileList] = ""
-    #df.add(other = z.E_PV_gen_kWh,axis = 'index')
-    #df.add()
+    zz = pd.read_csv(r"C:\Users\iA\OneDrive - ETHZ\Thesis\PM\CEA Data\Sample 1650\outputs\data\demand\\" + FileList + '.csv')
     df_demand[FileList] = ""
     df_demand[FileList] = zz.GRID_kWh
 
 #%% CORRECTION FOR SOLAR because of the CEA geometry ussue
-correct_solar = pd.read_excel(r"C:\\Users\\prakh\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\PV_Corrected_RednFactors.xlsx")
+correct_solar = pd.read_excel(r"C:\\Users\\iA\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\PV_Corrected_RednFactors.xlsx")
 
 temp_list = list(correct_solar.columns)
 
@@ -128,7 +120,7 @@ PV PRICES in the next years. Base PV price data from EnergieSchweiz.
 Projections Source = IEA Technology Roadmap 2014
 '''
     
-PV_price_baseline = pd.read_excel(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data\Solar PV Cost Projections\PV_Prices.xlsx')
+PV_price_baseline = pd.read_excel(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data\Solar PV Cost Projections\PV_Prices.xlsx')
 
 #this stores projected PV prices for all sizes of PV systems
 PV_price_projection = pd.DataFrame(data = None)
@@ -253,6 +245,7 @@ for year in range(PV_lifetime):
         list_selfcons_LOW =  df_LOW.loc [df_LOW[i + '_PV-dem'] < 0 , i + '_solar']
         sum_selfcons_LOW = sum(list_selfcons_LOW)
         
+        #wholesale or retail electricity pricing
         if agents_info.loc[i]['GRID_MWhyr'] >=100:
             ewz_high = 6/100 #CHF per kWh
             ewz_low = 5/100 #CHF per kWh
@@ -273,10 +266,6 @@ for year in range(PV_lifetime):
         else:
             scrs = total_self_consumption/total_PV_production
         
-        #!!!!!varying O&M costs with generation --> leads to reducing O&M costs which isn't logical, so maybe take out!!!!!!!!!!!!!!!!!!
-        #OM_costs = sum(df_solar_AC[i])*OM_Cost_rate 
-        
-        
         Agents_Savings[col_name] = ""
         #Agents_OM_Costs[col_name] = ""
         Agents_EWZ_Costs[col_name] = ""
@@ -286,8 +275,6 @@ for year in range(PV_lifetime):
         #list_om_costs.append(OM_costs)
         list_ewz_costs.append(ewz_solarsplit_costs)
         list_scrs.append(scrs)
-        
-               
         
         #degrading PV output every year
         df_solar_AC[i] = df_solar_AC[i]*(PV_degradation)
