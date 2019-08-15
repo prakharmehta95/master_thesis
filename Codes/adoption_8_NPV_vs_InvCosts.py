@@ -27,7 +27,7 @@ from Scheduler_StagedActivation_Random import StagedActivation_random
 from mesa.datacollection import DataCollector #for data collection, of course
 
 # =============================================================================
-#SCENARIO SETTINGS
+#SCENARIO SETTING
 
 #scenario = "ZEV" #100MWh criteria for forming communities and also community size limit of 100MWh
 #scenario = "no_ZEV"
@@ -60,6 +60,14 @@ if scenario == "ZEV":
     ZEV = 1             #binary variable to turn on/off whether to have ZEV/no ZEV
     comm_limit = 1      #limit of 100 MWh for community size applies
     
+    w_econ      = 0.30
+    w_swn       = 0.31
+    w_att       = 0.39
+    w_subplot   = 0.1
+    threshold   = 0.5
+    
+    reduction = -0.05
+    
 elif scenario == "no_ZEV":
     '''
     100% size, 100 MWh Restriction, Communities cannot be formed
@@ -82,7 +90,14 @@ elif scenario == "no_ZEV":
     Agents_Ind_Investments = pd.read_pickle('Agents_IND_nosubsidy_InvestmentCosts_Years.pickle')
     ZEV = 0 #community can't even be formed
     comm_limit = 1 #just to be consistent with code, this won't be used as ZEV = 0 for this scenario
-
+    
+    w_econ      = 0.30
+    w_swn       = 0.31
+    w_att       = 0.39
+    w_subplot   = 0.1
+    threshold   = 0.5
+    reduction = -0.05
+    
 elif scenario == "TOP4_no100MWh_retail":
     '''
     100% size, no 100 MWh Restriction BUT max 4 neighbours to form a community with
@@ -90,7 +105,7 @@ elif scenario == "TOP4_no100MWh_retail":
     
     #INFORMATION on agents and all combinations
     data = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_No_100MWh_Restriction.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
-    Agents_Possibles_Combos = pd.read_pickle('Duplicate_Combinations_TOP4_All_Info_commIDs.pickle')
+    Agents_Possibles_Combos = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combinations_TOP4_All_Info_commIDs.pickle')
     Agents_Possibles_Combos = Agents_Possibles_Combos.rename(index=str, columns={"Unnamed: 0": "Name_Comm",})
     Agents_Possibles_Combos = Agents_Possibles_Combos.set_index('Name_Comm')
     
@@ -101,14 +116,20 @@ elif scenario == "TOP4_no100MWh_retail":
     profitability_index = pd.read_pickle(r"C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Profitability_Index_Scaled.pickle")
        
     #NPV information
-    Agents_Ind_NPVs = pd.read_pickle('Agents_IND_nosubsidy_NPVs_Years.pickle')
-    Agents_Community_NPVs = pd.read_pickle('Duplicate_Combos_TOP4_nosubsidy_Agents_NPVs_Years.pickle')
-    Agents_Ind_SCRs = pd.read_pickle('Agents_IND_nosubsidy_SCR_Years.pickle')
-    Agents_Community_SCRs = pd.read_pickle('Duplicate_Combos_TOP4_nosubsidy_Agents_SCRs.pickle')
-    Agents_Ind_Investments = pd.read_pickle('Agents_IND_nosubsidy_InvestmentCosts_Years.pickle')
+    Agents_Ind_NPVs = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Agents_IND_nosubsidy_NPVs_Years.pickle')
+    Agents_Community_NPVs = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combos_TOP4_nosubsidy_Agents_NPVs_Years.pickle')
+    Agents_Ind_SCRs = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Agents_IND_nosubsidy_SCR_Years.pickle')
+    Agents_Community_SCRs = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combos_TOP4_nosubsidy_Agents_SCRs.pickle')
+    Agents_Ind_Investments = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Agents_IND_nosubsidy_InvestmentCosts_Years.pickle')
     
     ZEV = 1 # communities can be formed
     comm_limit = 0 #no 100 MWh limit for community size
+    w_econ      = 0.33
+    w_swn       = 0.42
+    w_att       = 0.25 
+    w_subplot   = 0.1
+    threshold   = 0.5
+    reduction = -0.0
     
 elif scenario == "TOP4_no100MWh_wholesale":
     '''
@@ -137,6 +158,12 @@ elif scenario == "TOP4_no100MWh_wholesale":
     ZEV = 1 # communities can be formed
     comm_limit = 0 #no 100 MWh limit for community size
     
+    w_econ      = 0.33
+    w_swn       = 0.42
+    w_att       = 0.25 
+    w_subplot   = 0.1
+    threshold   = 0.5
+    reduction = -0.0
 
 
 # =============================================================================
@@ -197,7 +224,7 @@ def make_swn():
                     l.append(np.nan)
             temp_df[i] = pd.Series(list(G.adj[i]))
         
-        swn_ref_Z0003 = pd.read_csv('SWN_List_less_100MWh.csv') #key of changing numbers to building names/IDs
+        swn_ref_Z0003 = pd.read_csv(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\SWN_List_less_100MWh.csv') #key of changing numbers to building names/IDs
         di = swn_ref_Z0003.Circular_List.to_dict()              #dictionary to replace numbers of the watts-stratogatz function with actual building names
         temp_df = temp_df.rename(columns = di)
         swn = pd.DataFrame(data = None)                         #holds all swns for all agents
@@ -212,7 +239,7 @@ def make_swn():
                     l.append(np.nan)
             temp_df[i] = pd.Series(list(G.adj[i]))
         
-        swn_ref_Z0003 = pd.read_csv('SWN_List.csv')             #key of changing numbers to building names/IDs
+        swn_ref_Z0003 = pd.read_csv(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\SWN_List.csv')             #key of changing numbers to building names/IDs
         di = swn_ref_Z0003.Circular_List.to_dict()              #dictionary to replace numbers of the watts-stratogatz function with actual building names
         temp_df = temp_df.rename(columns = di)
         swn = pd.DataFrame(data = None)                         #holds all swns for all agents
@@ -667,17 +694,21 @@ def stage1_intention(self, uid, attitude, pp,ratio,subplot_effect):
 
     #weights and thresholds for the intention function
     if scenario == "ZEV" or scenario == "no_ZEV":
-        w_econ      = 0.30
-        w_swn       = 0.31
-        w_att       = 0.39
-        w_subplot   = 0.1
-        threshold   = 0.5
+        dddd = 9
+        #print('stage1')
+        #w_econ      = 0.30
+        #w_swn       = 0.31
+        #w_att       = 0.39
+        #w_subplot   = 0.1
+        #threshold   = 0.5
     elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
-        w_econ      = 0.33
-        w_swn       = 0.42
-        w_att       = 0.25 
-        w_subplot   = 0.1
-        threshold   = 0.5
+        dddd = 9
+        #print('stage1')
+        #w_econ      = 0.33
+        #w_swn       = 0.42
+        #w_att       = 0.25 
+        #w_subplot   = 0.1
+        #threshold   = 0.5
     
     
     #the basic intention function:
@@ -724,11 +755,11 @@ def stage2_decision(self,uid,idea):
     
     #print("STAGE 2 ENTERED...............................................")
     
-    if scenario == "ZEV" or scenario == "no_ZEV":
-        reduction = -0.05    #how much negative NPV as a percentage of investment is allowed. 5% negative NPV allowed after calibration.
+    #if scenario == "ZEV" or scenario == "no_ZEV":
+     #   reduction = -0.05    #how much negative NPV as a percentage of investment is allowed. 5% negative NPV allowed after calibration.
             
-    elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
-        reduction = -0.00    #how much negative NPV as a percentage of investment is allowed. NO NEGATIVE NPV allowed after calibration.
+    #elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
+     #   reduction = -0.00    #how much negative NPV as a percentage of investment is allowed. NO NEGATIVE NPV allowed after calibration.
     
     agents_adopting_community_list = []
     ind_npv = Agents_Ind_NPVs.loc[step_ctr][self.unique_id]
@@ -753,18 +784,18 @@ def stage2_decision(self,uid,idea):
         #for the agents which can actually form communities
         if self.part_comm == 1 and ZEV == 1:
             
-            hh = [] #temporary lists
-            hhh =[]
+            temp_agent_info_list_one = []
+            temp_agent_info_list_two = []
             for i in range(len(agents_objects_list)):
-                hh.append(agents_objects_list[i].unique_id)
-                hhh.append(agents_objects_list[i].intention_yr)
-                
-            zzz = pd.DataFrame(data = None) #temporary dataframe to hold agent information about intention in that year of simulation
-            zzz['unique_id'] = hh
-            zzz['intention_yr'] = hhh
-            zzz.set_index('unique_id')
+                temp_agent_info_list_one.append(agents_objects_list[i].unique_id)
+                temp_agent_info_list_two.append(agents_objects_list[i].intention_yr)
             
-            all_positive_intention_agents = zzz[zzz['intention_yr'] == 1] #filter out agents with positive intention
+            temp_agent_info_df = pd.DataFrame(data = None) #temporary dataframe to hold agent information about intention in that year of simulation
+            temp_agent_info_df['unique_id'] = temp_agent_info_list_one
+            temp_agent_info_df['intention_yr'] = temp_agent_info_list_two
+            temp_agent_info_df.set_index('unique_id')
+            
+            all_positive_intention_agents = temp_agent_info_df[temp_agent_info_df['intention_yr'] == 1] #filter out agents with positive intention
             list_all_positive_intention_agents = all_positive_intention_agents.unique_id.tolist() #create a list of positive intention agents
             pos_intent_comm_members = []
             
@@ -800,17 +831,17 @@ def stage2_decision(self,uid,idea):
                         names_possible_combos_list.append(temp_name) #all possible combos which can be formed this year. Example: ''Z0054_Z0055' 
             
             
-            g_df = pd.DataFrame(data = None,index = range(1)) #dataframe to hold which combos can exist and which have positive NPVs
+            temp_combos_exist_df = pd.DataFrame(data = None,index = range(1)) #dataframe to hold which combos can exist and which have positive NPVs
             
             #for loop to find which of the combos can actually exist and which have positive NPVs
             for g in names_possible_combos_list:
                 if g in list(Agents_Community_NPVs.columns):
                     if Agents_Community_NPVs.loc[step_ctr][g] > 0:
-                        g_df[g] = ""
-                        g_df.update(pd.Series([Agents_Community_NPVs.loc[step_ctr][g]], name  = g, index = [0]))
+                        temp_combos_exist_df[g] = ""
+                        temp_combos_exist_df.update(pd.Series([Agents_Community_NPVs.loc[step_ctr][g]], name  = g, index = [0]))
                         
             npvs_list = pd.DataFrame(data = None)
-            npvs_list = g_df.loc[0,:] #take the 1st row of the temporary g_df dataframe as it contains all NPVs of all possible combinations
+            npvs_list = temp_combos_exist_df.loc[0,:] #take the 1st row of the temporary temp_combos_exist_df dataframe as it contains all NPVs of all possible combinations
             npvs_list2 = pd.to_numeric(npvs_list)#, errors = 'coerce', axis=0)
             
             #check if there are communities which can be formed after all the filtering I have done previously

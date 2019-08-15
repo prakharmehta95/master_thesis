@@ -5,7 +5,7 @@ Created on Tue Apr 16 18:34:17 2019
 @author: iA
 """
 
-
+# -*- coding: utf-8 -*-
 """
 Created on Tue Apr  9 18:45:09 2019
 
@@ -181,7 +181,7 @@ for year in range(PV_lifetime):
 #--------
 #%%
 
-print("Now I can leave")
+print("Now I can leave - this takes 8 hours!")
 for year in range(PV_lifetime):
     col_name = 'Year' + str(year)
     list_savings = []

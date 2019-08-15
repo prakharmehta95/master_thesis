@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 """
 Created on Wed May  8 18:23:37 2019
 
@@ -20,9 +20,11 @@ from adoption_8_NPV_vs_InvCosts import scenario
 
 
 number = 1437   #number of agents
-years = 18      #how long should the ABM run for - ideally, 18 years from 2018 - 2035
+years = 18     #how long should the ABM run for - ideally, 18 years from 2018 - 2035
 
 #empty dictionaries to store results
+results_agentlevel = {}
+results_emergent = {}
 d_gini_correct = {}
 d_gini_model_correct = {}
 d_agents_info_runs_correct = {}
@@ -61,8 +63,8 @@ for j in range(runs):
     gini_model = test.datacollector.get_model_vars_dataframe()
     
     #stores results across multiple runs
-    d_gini_correct[temp_name] = gini
-    d_gini_model_correct[temp_name_2] = gini_model
+    results_agentlevel[temp_name] = gini
+    results_emergent[temp_name_2] = gini_model
     
 
 
@@ -73,7 +75,7 @@ pickle.dump(d_agents_info_runs_correct,f)
 f.close()
 
 #f = open("03June_ZEV_d_gini.pickle","wb") #enter name of the stored result file
-pickle.dump(d_gini_correct,f)
+pickle.dump(results_agentlevel,f)
 f.close()
 
 #f = open("03June_ZEV_d_combos_info_runs.pickle","wb") #enter name of the stored result file
@@ -81,7 +83,7 @@ pickle.dump(d_combos_info_runs_correct,f)
 f.close()
 
 #f = open("03June_ZEV_d_gini_model.pickle","wb") #enter name of the stored result file
-pickle.dump(d_gini_model_correct,f)
+pickle.dump(results_emergent,f)
 f.close()
 
 
