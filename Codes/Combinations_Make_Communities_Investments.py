@@ -5,7 +5,6 @@ Created on Wed Apr 17 10:12:36 2019
 @author: iA
 """
 
-# -*- coding: utf-8 -*-
 """
 Created on Mon Apr 15 10:37:34 2019
 

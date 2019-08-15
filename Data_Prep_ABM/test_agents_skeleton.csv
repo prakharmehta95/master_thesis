@@ -1,0 +1,6 @@
+﻿bldg_id,bldg_type,bldg_owner_type,plot_id,possible_community_with,attitude,SWN,PP
+Z0000,Residential,Private,1,Z0003;Z0047;Z0065,0.8,Z0007;Z0444;Z0541,0.5
+Z0001,Residential,Genossenschaften,6,Z0008; Z0078,0.7,Z0045;Z0645;Z0008,0.4
+Z0002,Public,Stadt Zurich,998,Z0069; Z0971,0.9,Z0499;Z1799;Z0088,0.8
+Z0003,Residential,Genossenschaften,1,Z0000; Z0047;Z0066,0.5,Z0007;Z0400;Z0500,0.9
+Z0004,Commercial,Genossenschaften,45,Z0044,0.6,Z0097;Z0736;Z1111,0.75
