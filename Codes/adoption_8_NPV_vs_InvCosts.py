@@ -27,7 +27,7 @@ from Scheduler_StagedActivation_Random import StagedActivation_random
 from mesa.datacollection import DataCollector #for data collection, of course
 
 # =============================================================================
-#SCENARIO SETTING
+#SCENARIO SETTINGS
 
 #scenario = "ZEV" #100MWh criteria for forming communities and also community size limit of 100MWh
 #scenario = "no_ZEV"
