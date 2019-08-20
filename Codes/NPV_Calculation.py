@@ -4,24 +4,52 @@ Created on Tue Apr  9 18:45:09 2019
 
 @author: iA
 """
+#%% importing arguments from run_adoption_loop
+
+#Price Levels
+from __main__ import PV_price_baseline
+from __main__ import fit_high #= 8.5/100 #CHF per kWH
+from __main__ import fit_low #=  4.45/100 #CHF per kWH
+from __main__ import ewz_high_large#6/100 #CHF per kWh
+from __main__ import ewz_low_large#5/100 #CHF per kWh
+from __main__ import ewz_high_small#24.3/100 #CHF per kWh
+from __main__ import ewz_low_small#14.4/100 #CHF per kWh
+from __main__ import ewz_solarsplit_fee #= 4/100 #CHF per kWH      
+
+#PV Panel Properties
+from __main__ import PV_lifetime #= 25 #years
+from __main__ import PV_degradation #= 0.994 #(0.6% every year)
+from __main__ import OM_Cost_rate #= 0.06 # CHF per kWh of solar PV production
+from __main__ import disc_rate
+
+#Agent information
+from __main__ import agents_info
+from __main__ import agents_list_final
+
+#%%
 import pandas as pd
-agents_info = pd.read_excel(r"C:\\Users\\prakh\\OneDrive - ETHZ\\Thesis\\PM\\Data_Prep_ABM\\Skeleton_Updated_No_100MWh_Restriction.xlsx")
+#read this now from the MAIN FILE
+#agents_info = pd.read_excel(r"C:\\Users\\prakh\\OneDrive - ETHZ\\Thesis\\PM\\Data_Prep_ABM\\Skeleton_Updated_No_100MWh_Restriction.xlsx")
 agents_info = agents_info.set_index('bldg_id')    
 
 # =============================================================================
 #%% IMPORT SOLAR PV GENERATION FOR EACH BUILDING
 import os
-os.chdir(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB')
+#os.chdir(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB')
 import glob
 import pandas as pd
-agent_list_final = pd.read_excel(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\LIST_AGENTS_FINAL.xlsx')
+
+#read this now from the MAIN FILE
+#agent_list_final = pd.read_excel(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\LIST_AGENTS_FINAL.xlsx')
 
 agent_list_final = list(agent_list_final.Bldg_IDs)
+agent_list_final = ['Z0003','Z0004']
+
 df_solar = pd.DataFrame(data = None)
 for FileList in agent_list_final:
     print(FileList)
     #path = r."C:\\Users\\iA\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\solar\\"
-    z = pd.read_csv(r"C:\\Users\\iA\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\solar\\" + FileList + '_PV.csv')
+    z = pd.read_csv(r"C:\\Users\\prakh\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\solar\\" + FileList + '_PV.csv')
     df_solar[FileList] = ""
     df_solar[FileList] = z.E_PV_gen_kWh
  
@@ -30,12 +58,12 @@ for FileList in agent_list_final:
 df_demand = pd.DataFrame(data = None)
 for FileList in agent_list_final:
     print(FileList)
-    zz = pd.read_csv(r"C:\Users\iA\OneDrive - ETHZ\Thesis\PM\CEA Data\Sample 1650\outputs\data\demand\\" + FileList + '.csv')
+    zz = pd.read_csv(r"C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\CEA Data\Sample 1650\outputs\data\demand\\" + FileList + '.csv')
     df_demand[FileList] = ""
     df_demand[FileList] = zz.GRID_kWh
 
 #%% CORRECTION FOR SOLAR because of the CEA geometry ussue
-correct_solar = pd.read_excel(r"C:\\Users\\iA\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\PV_Corrected_RednFactors.xlsx")
+correct_solar = pd.read_excel(r"C:\\Users\\prakh\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\PV_Corrected_RednFactors.xlsx")
 
 temp_list = list(correct_solar.columns)
 
@@ -119,8 +147,9 @@ df_demand['price_level'] = np.where(np.logical_and(np.logical_and(df_solar_AC['H
 PV PRICES in the next years. Base PV price data from EnergieSchweiz.
 Projections Source = IEA Technology Roadmap 2014
 '''
-    
-PV_price_baseline = pd.read_excel(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data\Solar PV Cost Projections\PV_Prices.xlsx')
+
+#import next line from main...    
+#PV_price_baseline = pd.read_excel(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data\Solar PV Cost Projections\PV_Prices.xlsx')
 
 #this stores projected PV prices for all sizes of PV systems
 PV_price_projection = pd.DataFrame(data = None)
@@ -155,18 +184,21 @@ print("Prep for NPV Calculation")
 #dataframes to filter high and low times
 df_HIGH = pd.DataFrame(data = None)        
 df_LOW = pd.DataFrame(data = None)        
-
-fit_high = 8.5/100 #CHF per kWH
-fit_low =  4.45/100 #CHF per kWH
-
-#ewz_high = 24.3/100 #CHF per kWH
-#ewz_low = 14.4/100 #CHF per kWH
-ewz_solarsplit_fee = 4/100 #CHF per kWH      
-
-PV_lifetime = 25 #years
-PV_degradation = 0.994 #(0.6% every year)
-OM_Cost_rate = 0.06 # CHF per kWh of solar PV production
-
+# =============================================================================
+# READ IN FROM THE MAIN FILE
+# 
+# fit_high = 8.5/100 #CHF per kWH
+# fit_low =  4.45/100 #CHF per kWH
+# 
+# #ewz_high = 24.3/100 #CHF per kWH
+# #ewz_low = 14.4/100 #CHF per kWH
+# ewz_solarsplit_fee = 4/100 #CHF per kWH      
+# 
+# PV_lifetime = 25 #years
+# PV_degradation = 0.994 #(0.6% every year)
+# OM_Cost_rate = 0.06 # CHF per kWh of solar PV production
+# 
+# =============================================================================
 Agents_Savings = pd.DataFrame(data = None, index = agent_list_final)
 Agents_OM_Costs = pd.DataFrame(data = None, index = agent_list_final)
 Agents_EWZ_Costs= pd.DataFrame(data = None, index = agent_list_final)
@@ -247,11 +279,11 @@ for year in range(PV_lifetime):
         
         #wholesale or retail electricity pricing
         if agents_info.loc[i]['GRID_MWhyr'] >=100:
-            ewz_high = 6/100 #CHF per kWh
-            ewz_low = 5/100 #CHF per kWh
+            ewz_high = ewz_high_large#6/100 #CHF per kWh
+            ewz_low = ewz_low_large#5/100 #CHF per kWh
         elif agents_info.loc[i]['GRID_MWhyr'] < 100:
-            ewz_high = 24.3/100 #CHF per kWh
-            ewz_low = 14.4/100 #CHF per kWh
+            ewz_high = ewz_high_small#24.3/100 #CHF per kWh
+            ewz_low = ewz_low_small#14.4/100 #CHF per kWh
         
         
         savings = (sum_extraPV_HIGH*fit_high + sum_dem_selfcons_HIGH*ewz_high + sum_selfcons_HIGH * ewz_high +
@@ -298,7 +330,7 @@ large PV = >= 100kW
 
 print("NPV Calculation")
 
-disc_rate = 0.05
+#disc_rate = 0.05 - NOW READ FROM THE MAIN FILE
 
 Agents_NPVs = pd.DataFrame(data = None, index = list(range(0,18)), columns = agent_list_final)
 Agents_NPVs['Installation_Year'] = list(range(2018,2036))
@@ -439,21 +471,21 @@ for i in agent_list_final:#['Z0003','Z0004']: #put agent_list_final here later
 #%% writing data to pickle
 #os.chdir(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB')
 
-Agents_NPVs.to_pickle('Agents_IND_wholesale_nosubsidy_NPVs_Years.pickle')
+#Agents_NPVs.to_pickle('Agents_IND_wholesale_nosubsidy_NPVs_Years.pickle')
 
-Agents_SCRs.to_pickle('Agents_IND_wholesale_nosubsidy_SCR_Years.pickle')
+#Agents_SCRs.to_pickle('Agents_IND_wholesale_nosubsidy_SCR_Years.pickle')
 
-Agents_Investment_Costs.to_pickle('Agents_IND_wholesale_nosubsidy_InvestmentCosts_Years.pickle')
+#Agents_Investment_Costs.to_pickle('Agents_IND_wholesale_nosubsidy_InvestmentCosts_Years.pickle')
 
-Agents_Savings.to_pickle('Agents_IND_wholesale_nosubsidy_Savings_Years.pickle')
+#Agents_Savings.to_pickle('Agents_IND_wholesale_nosubsidy_Savings_Years.pickle')
 
-Agents_NetSavings.to_pickle('Agents_IND_wholesale_nosubsidy_NetSavings_Years.pickle')
+#Agents_NetSavings.to_pickle('Agents_IND_wholesale_nosubsidy_NetSavings_Years.pickle')
 
-Agents_OM_Costs.to_pickle('Agents_IND_wholesale_nosubsidy_OM_Costs_Years.pickle')
+#Agents_OM_Costs.to_pickle('Agents_IND_wholesale_nosubsidy_OM_Costs_Years.pickle')
 
-Agents_PV_Investment_Costs.to_pickle('Agents_IND_wholesale_nosubsidy_Investment_Costs_Years.pickle')
+#Agents_PV_Investment_Costs.to_pickle('Agents_IND_wholesale_nosubsidy_Investment_Costs_Years.pickle')
 
-Agents_Smart_Meter_Investment_Costs.to_pickle('Agents_IND_wholesale_nosubsidy_Smart_Meter_Costs_Years.pickle')
+#Agents_Smart_Meter_Investment_Costs.to_pickle('Agents_IND_wholesale_nosubsidy_Smart_Meter_Costs_Years.pickle')
 
 #%% writing data to excel
 

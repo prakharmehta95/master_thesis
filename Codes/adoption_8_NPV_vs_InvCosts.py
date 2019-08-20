@@ -9,7 +9,12 @@ Created on Thu Apr  4 17:58:04 2019
 """
 Initial libraries and data import
 """
-
+from __main__ import *
+print(scenario)
+print(npvvvvv.columns)
+ccc = npvvvvv.Z0003
+print(ccc)
+#%%
 #useful packages to work with
 import random 
 import itertools
@@ -26,12 +31,28 @@ from mesa import Agent, Model #base classes
 from Scheduler_StagedActivation_Random import StagedActivation_random
 from mesa.datacollection import DataCollector #for data collection, of course
 
+#%%
+"""
+Individual NPV Calculation
+Call another python file and pass new scenario prices etc. from here
+"""
+
+#import NPV_Calculation
+
+#NPV_Calculation.set_arguments('pass arguments here')
+#def scenario_args():
+    
+
+
+
+
+#%%
 # =============================================================================
 #SCENARIO SETTING
 
 #scenario = "ZEV" #100MWh criteria for forming communities and also community size limit of 100MWh
 #scenario = "no_ZEV"
-scenario = "TOP4_no100MWh_retail"
+#scenario = "TOP4_no100MWh_retail"
 #scenario = "TOP4_no100MWh_wholesale"
 #scenario = 2 #no 100MWh criteria but max 4 neighbours considered in forming the communities
 #scenario = 'laptop_top4'
@@ -104,23 +125,26 @@ elif scenario == "TOP4_no100MWh_retail":
     '''
     
     #INFORMATION on agents and all combinations
-    data = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_No_100MWh_Restriction.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
-    Agents_Possibles_Combos = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combinations_TOP4_All_Info_commIDs.pickle')
+    #data = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_No_100MWh_Restriction.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
+    #Agents_Possibles_Combos = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combinations_TOP4_All_Info_commIDs.pickle')
+    data = pd.read_excel (r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_No_100MWh_Restriction.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
+    Agents_Possibles_Combos = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combinations_TOP4_All_Info_commIDs.pickle')
+    
     Agents_Possibles_Combos = Agents_Possibles_Combos.rename(index=str, columns={"Unnamed: 0": "Name_Comm",})
     Agents_Possibles_Combos = Agents_Possibles_Combos.set_index('Name_Comm')
     
     #list of all possible subplots i.e. neighbours to form a community with
-    subplots_final = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\subplots_CLEAN_100MWh_TOP4.xlsx') 
+    subplots_final = pd.read_excel (r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\subplots_CLEAN_100MWh_TOP4.xlsx') 
     
     #profitability index for individual agents
-    profitability_index = pd.read_pickle(r"C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Profitability_Index_Scaled.pickle")
+    profitability_index = pd.read_pickle(r"C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Profitability_Index_Scaled.pickle")
        
     #NPV information
-    Agents_Ind_NPVs = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Agents_IND_nosubsidy_NPVs_Years.pickle')
-    Agents_Community_NPVs = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combos_TOP4_nosubsidy_Agents_NPVs_Years.pickle')
-    Agents_Ind_SCRs = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Agents_IND_nosubsidy_SCR_Years.pickle')
-    Agents_Community_SCRs = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combos_TOP4_nosubsidy_Agents_SCRs.pickle')
-    Agents_Ind_Investments = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Agents_IND_nosubsidy_InvestmentCosts_Years.pickle')
+    Agents_Ind_NPVs = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Agents_IND_nosubsidy_NPVs_Years.pickle')
+    Agents_Community_NPVs = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combos_TOP4_nosubsidy_Agents_NPVs_Years.pickle')
+    Agents_Ind_SCRs = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Agents_IND_nosubsidy_SCR_Years.pickle')
+    Agents_Community_SCRs = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combos_TOP4_nosubsidy_Agents_SCRs.pickle')
+    Agents_Ind_Investments = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Agents_IND_nosubsidy_InvestmentCosts_Years.pickle')
     
     ZEV = 1 # communities can be formed
     comm_limit = 0 #no 100 MWh limit for community size
@@ -198,6 +222,7 @@ agents_subplots = subplots_final
 
 # =============================================================================
 # SMALL WORLD NETWORK
+#SHIFT THIS TO THE MAIN FILE AS WELL!!
 def make_swn():
     '''
     to make random groups of small world networks 
@@ -239,7 +264,7 @@ def make_swn():
                     l.append(np.nan)
             temp_df[i] = pd.Series(list(G.adj[i]))
         
-        swn_ref_Z0003 = pd.read_csv(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\SWN_List.csv')             #key of changing numbers to building names/IDs
+        swn_ref_Z0003 = pd.read_csv(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\SWN_List.csv')             #key of changing numbers to building names/IDs
         di = swn_ref_Z0003.Circular_List.to_dict()              #dictionary to replace numbers of the watts-stratogatz function with actual building names
         temp_df = temp_df.rename(columns = di)
         swn = pd.DataFrame(data = None)                         #holds all swns for all agents
@@ -295,7 +320,7 @@ class tpb_agent(Agent):
         
         self.bldg_type = bldg_type
         self.attitude = attitude
-        self.pp = econ_attr(self)               #calls the economic attractiveness function to assign the profitability index to each agent
+        self.pp = functions.econ_attr(self)               #calls the economic attractiveness function to assign the profitability index to each agent
         self.intention = intention              #stores the intention of the agent (whether or not it passed idea stage)
         self.intention_yr = intention_yr        #stores the intention of the agent every year of the simulation
         self.swn_ratio = swn_ratio
@@ -326,9 +351,9 @@ class tpb_agent(Agent):
         else:
             #print("start of new agent uid = ",self.unique_id, "has intention = ",self.intention)
             calling_list.append(self.unique_id)
-            check_peers(self,self.unique_id)                            #sets the swn_ratio
-            check_neighbours_subplots(self,self.unique_id)              #sets the subplot effect attribute
-            self.pp = econ_attr(self)
+            functions.check_peers(self,self.unique_id)                            #sets the swn_ratio
+            functions.check_neighbours_subplots(self,self.unique_id)              #sets the subplot effect attribute
+            self.pp = functions.econ_attr(self)
             
             #call the intention function
             stage1_intention(self,self.unique_id, self.attitude,self.pp,self.swn_ratio,self.subplot_effect)
@@ -402,7 +427,7 @@ class tpb(Model):
             en_champ = 0
             
             #agent creation
-            a = tpb_agent(agents_info.loc[i]['IDs'],self,agents_info.loc[i]['Building_Type_Category'],env_attitude(agents_info.loc[i]['IDs']),#gauss(0.6,0.2),#env_attitude,
+            a = tpb_agent(agents_info.loc[i]['IDs'],self,agents_info.loc[i]['Building_Type_Category'],functions.env_attitude(agents_info.loc[i]['IDs']),#gauss(0.6,0.2),#env_attitude,
                           0,intention,intention_yr,#econ_attr(self)
                           ratio,subplot_effect,total,counter,
                           adopt_ind,adopt_comm,adopt_year,agents_info.loc[i]['Part_Comm_YN'],en_champ,agents_info.loc[i]['PV_Size'],
@@ -415,13 +440,13 @@ class tpb(Model):
 
         
         #data collection
-        self.datacollector = DataCollector(model_reporters = {"Individual_solar":cumulate_solar_ind,"Ind_PV_Installed":cumulate_solar_ind_sizes,
-                                                              "Community_solar":cumulate_solar_comm,"Energy_Champions":cumulate_solar_champions,
-                                                              "Comm_PV_Installed":cumulate_solar_comm_sizes,
-                                                              "Agent_Type_Res":agent_type_res,"Agent_Type_Res_PV_Size":agent_type_res_CAP,
-                                                              "Agent_Type_Comm":agent_type_comm,"Agent_Type_Comm_PV_Size":agent_type_comm_CAP,
-                                                              "Agent_Type_Pub":agent_type_pub,"Agent_Type_Pub_PV_Size":agent_type_pub_CAP,
-                                                              "EGIDs_greater_than_one":zone_egids,"EGIDs_greater_than_one_SIZE":zone_egids_size},
+        self.datacollector = DataCollector(model_reporters = {"Individual_solar":functions.cumulate_solar_ind,"Ind_PV_Installed":functions.cumulate_solar_ind_sizes,
+                                                              "Community_solar":functions.cumulate_solar_comm,"Energy_Champions":functions.cumulate_solar_champions,
+                                                              "Comm_PV_Installed":functions.cumulate_solar_comm_sizes,
+                                                              "Agent_Type_Res":functions.agent_type_res,"Agent_Type_Res_PV_Size":functions.agent_type_res_CAP,
+                                                              "Agent_Type_Comm":functions.agent_type_comm,"Agent_Type_Comm_PV_Size":functions.agent_type_comm_CAP,
+                                                              "Agent_Type_Pub":functions.agent_type_pub,"Agent_Type_Pub_PV_Size":functions.agent_type_pub_CAP,
+                                                              "EGIDs_greater_than_one":functions.zone_egids,"EGIDs_greater_than_one_SIZE":functions.zone_egids_size},
                 agent_reporters = {"Building_ID":"unique_id","Building_Type":"bldg_type","Part_Comm":"part_comm",
                                    "PV_Size":"pv_size","Demand_MWhyr":"dem_total","Intention" : "intention",
                                    "Yearly_Intention":"intention_yr","Attitude" : "attitude","Payback Period" : "pp",
@@ -443,240 +468,245 @@ class tpb(Model):
 
 #%% MORE FUNCTIONS for agent attributes and also for outputs of ABM segregated by agent types
 
-def agent_type_res(model):
-    '''
-    to find total number of RESIDENTIAL individual adoptions
-    '''
-    sum_agent_type_res_ind = 0
-    for i in model.schedule.agents:
-        if i.bldg_type == 'Residential':
-            sum_agent_type_res_ind = sum_agent_type_res_ind + i.adopt_ind
-    return sum_agent_type_res_ind
+class functions:
+    """
+    FUNCTIONS for agent attributes, counting installed capacity by building typologies
+    """
 
-def agent_type_res_CAP(model):
-    '''
-    to find total CAPACITY of RESIDENTIAL individual adoptions
-    '''
-    sum_agent_type_res_ind_cap = 0
-    for i in model.schedule.agents:
-        if i.bldg_type == 'Residential' and i.adopt_ind == 1:
-            sum_agent_type_res_ind_cap = sum_agent_type_res_ind_cap + i.pv_size
-    return sum_agent_type_res_ind_cap
+    def agent_type_res(model):
+        '''
+        to find total number of RESIDENTIAL individual adoptions
+        '''
+        sum_agent_type_res_ind = 0
+        for i in model.schedule.agents:
+            if i.bldg_type == 'Residential':
+                sum_agent_type_res_ind = sum_agent_type_res_ind + i.adopt_ind
+        return sum_agent_type_res_ind
     
-
-def agent_type_comm(model):
-    '''
-    to find total number of COMMERCIAL individual adoptions
-    '''
-    sum_agent_type_comm_ind = 0
-    for i in model.schedule.agents:
-        if i.bldg_type == 'Commercial':
-            sum_agent_type_comm_ind = sum_agent_type_comm_ind + i.adopt_ind
-    return sum_agent_type_comm_ind
-
-
-def agent_type_comm_CAP(model):
-    '''
-    to find total CAPACITY of COMMERCIAL individual adoptions
-    '''
-    sum_agent_type_comm_ind_cap = 0
-    for i in model.schedule.agents:
-        if i.bldg_type == 'Commercial' and i.adopt_ind == 1:
-            sum_agent_type_comm_ind_cap = sum_agent_type_comm_ind_cap + i.pv_size
-    return sum_agent_type_comm_ind_cap
-
-def agent_type_pub(model):
-    '''
-    to find total number of PUBLIC individual adoptions
-    '''
-    sum_agent_type_pub_ind = 0
-    for i in model.schedule.agents:
-        if i.bldg_type == 'Public':
-            sum_agent_type_pub_ind = sum_agent_type_pub_ind + i.adopt_ind
-    return sum_agent_type_pub_ind
-
-def agent_type_pub_CAP(model):
-    '''
-    to find total CAPACITY of PUBLIC individual adoptions
-    '''
-    sum_agent_type_pub_ind_cap = 0
-    for i in model.schedule.agents:
-        if i.bldg_type == 'Public' and i.adopt_ind == 1:
-            sum_agent_type_pub_ind_cap = sum_agent_type_pub_ind_cap + i.pv_size
-    return sum_agent_type_pub_ind_cap
-
-def zone_egids(model):
-    '''
-    to know if an individual adoption is actually like a community because of the CEA ZONES
-    '''
-    sum_EGID = 0
-    for i in model.schedule.agents:
-        if i.egids > 1:
-            sum_EGID = sum_EGID + i.adopt_ind
-    return sum_EGID
-
-def zone_egids_size(model):
-    '''
-    to know if an individual adoption is actually like a community because of the CEA ZONES, getting SIZES
-    '''
-    sum_EGID = 0
-    for i in model.schedule.agents:
-        if i.egids > 1 and i.adopt_ind == 1:
-            sum_EGID = sum_EGID + i.pv_size
-    return sum_EGID
-
-def cumulate_solar_ind(model):
-    """
-    To find the cumulative INDIVIDUAL installations at the end of every time step
-    """
-    solar_sum_ind = 0
-    for i in model.schedule.agents:
-        solar_sum_ind = solar_sum_ind + i.adopt_ind
-    return solar_sum_ind
+    def agent_type_res_CAP(model):
+        '''
+        to find total CAPACITY of RESIDENTIAL individual adoptions
+        '''
+        sum_agent_type_res_ind_cap = 0
+        for i in model.schedule.agents:
+            if i.bldg_type == 'Residential' and i.adopt_ind == 1:
+                sum_agent_type_res_ind_cap = sum_agent_type_res_ind_cap + i.pv_size
+        return sum_agent_type_res_ind_cap
         
-def cumulate_solar_comm(model):
-    """
-    To find the cumulative COMMUNITY "ALL buildings with installations" at the end of every time step
-    """
-    solar_sum_comm = 0
-    for i in model.schedule.agents:
-        solar_sum_comm = solar_sum_comm + i.adopt_comm
-    return solar_sum_comm  
-
-def cumulate_solar_champions(model):
-    """
-    To find the cumulative COMMUNITY installations at the end of every time step
-    """
-    solar_sum_champ = 0
-    for i in model.schedule.agents:
-        solar_sum_champ = solar_sum_champ + i.en_champ
-    return solar_sum_champ        
-
-def cumulate_solar_ind_sizes(model):
-    """
-    To find the cumulative COMMUNITY solar capacity at the end of every time step
-    """
-    solar_sum_sizes = 0
     
-    for i in model.schedule.agents:
-        if i.adopt_ind == 1:
-            solar_sum_sizes = solar_sum_sizes + i.pv_size
-    return solar_sum_sizes
- 
-def cumulate_solar_comm_sizes(model):
-    """
-    To find the cumulative COMMUNITY solar capacity at the end of every time step
-    """
-    solar_comm_sizes = 0
-    for i in model.schedule.agents:
-        if i.adopt_comm == 1:
-            solar_comm_sizes = solar_comm_sizes + i.pv_size
-    return solar_comm_sizes
-
-
-def env_attitude(uid):#(self, uid, attitude):
-    """
-    To change the environmental attitude depending on the steps.
-    NOT TO BE CHANGED IN MODEL v1.0!
-    """
-    uid = uid
-    if agents_info.loc[uid]['MINERGIE'] == 1:
-        value = 0.95
-    else:
-        value = gauss(0.698,0.18)
-    if value > 1:
-        value = 1 #to keep it from going over 1
-    return value
-
-
-def econ_attr(self):
-    """
-    To update the payback ratio every step
-    Takes data from the profitability_index pickle
-    """
-    uid = self.unique_id
-    try:
-        self.pp = profitability_index.loc[step_ctr][uid]
-    except KeyError:
-        self.pp = 0
+    def agent_type_comm(model):
+        '''
+        to find total number of COMMERCIAL individual adoptions
+        '''
+        sum_agent_type_comm_ind = 0
+        for i in model.schedule.agents:
+            if i.bldg_type == 'Commercial':
+                sum_agent_type_comm_ind = sum_agent_type_comm_ind + i.adopt_ind
+        return sum_agent_type_comm_ind
     
-    if self.pp < 0:
-        self.pp = 0
+    
+    def agent_type_comm_CAP(model):
+        '''
+        to find total CAPACITY of COMMERCIAL individual adoptions
+        '''
+        sum_agent_type_comm_ind_cap = 0
+        for i in model.schedule.agents:
+            if i.bldg_type == 'Commercial' and i.adopt_ind == 1:
+                sum_agent_type_comm_ind_cap = sum_agent_type_comm_ind_cap + i.pv_size
+        return sum_agent_type_comm_ind_cap
+    
+    def agent_type_pub(model):
+        '''
+        to find total number of PUBLIC individual adoptions
+        '''
+        sum_agent_type_pub_ind = 0
+        for i in model.schedule.agents:
+            if i.bldg_type == 'Public':
+                sum_agent_type_pub_ind = sum_agent_type_pub_ind + i.adopt_ind
+        return sum_agent_type_pub_ind
+    
+    def agent_type_pub_CAP(model):
+        '''
+        to find total CAPACITY of PUBLIC individual adoptions
+        '''
+        sum_agent_type_pub_ind_cap = 0
+        for i in model.schedule.agents:
+            if i.bldg_type == 'Public' and i.adopt_ind == 1:
+                sum_agent_type_pub_ind_cap = sum_agent_type_pub_ind_cap + i.pv_size
+        return sum_agent_type_pub_ind_cap
+    
+    def zone_egids(model):
+        '''
+        to know if an individual adoption is actually like a community because of the CEA ZONES
+        '''
+        sum_EGID = 0
+        for i in model.schedule.agents:
+            if i.egids > 1:
+                sum_EGID = sum_EGID + i.adopt_ind
+        return sum_EGID
+    
+    def zone_egids_size(model):
+        '''
+        to know if an individual adoption is actually like a community because of the CEA ZONES, getting SIZES
+        '''
+        sum_EGID = 0
+        for i in model.schedule.agents:
+            if i.egids > 1 and i.adopt_ind == 1:
+                sum_EGID = sum_EGID + i.pv_size
+        return sum_EGID
+    
+    def cumulate_solar_ind(model):
+        """
+        To find the cumulative INDIVIDUAL installations at the end of every time step
+        """
+        solar_sum_ind = 0
+        for i in model.schedule.agents:
+            solar_sum_ind = solar_sum_ind + i.adopt_ind
+        return solar_sum_ind
+            
+    def cumulate_solar_comm(model):
+        """
+        To find the cumulative COMMUNITY "ALL buildings with installations" at the end of every time step
+        """
+        solar_sum_comm = 0
+        for i in model.schedule.agents:
+            solar_sum_comm = solar_sum_comm + i.adopt_comm
+        return solar_sum_comm  
+    
+    def cumulate_solar_champions(model):
+        """
+        To find the cumulative COMMUNITY installations at the end of every time step
+        """
+        solar_sum_champ = 0
+        for i in model.schedule.agents:
+            solar_sum_champ = solar_sum_champ + i.en_champ
+        return solar_sum_champ        
+    
+    def cumulate_solar_ind_sizes(model):
+        """
+        To find the cumulative COMMUNITY solar capacity at the end of every time step
+        """
+        solar_sum_sizes = 0
         
-    return self.pp
-
-def check_peers(self,uid):
-    """
-    Checks how many other agents (or peers) in the SWN have installed solar
-    sets agent attribute swn_ratio (self.swn_ratio) accordingly
+        for i in model.schedule.agents:
+            if i.adopt_ind == 1:
+                solar_sum_sizes = solar_sum_sizes + i.pv_size
+        return solar_sum_sizes
+     
+    def cumulate_solar_comm_sizes(model):
+        """
+        To find the cumulative COMMUNITY solar capacity at the end of every time step
+        """
+        solar_comm_sizes = 0
+        for i in model.schedule.agents:
+            if i.adopt_comm == 1:
+                solar_comm_sizes = solar_comm_sizes + i.pv_size
+        return solar_comm_sizes
     
-    Uses:
-        agents_peers (it is a DataFrame) - list of all people in the SWN of each building
-    """
-    swn_with_solar = 0
-    temp_list = []
-    temp_list = agents_peers[uid].values.tolist() #make a list of all peers of that particular agent with uid
     
-    """
-    Explanation of the for loops coming ahead:
-        each agent considered by referencing its self.unique_id (or uid)
-        for z in temp_list() --> z becomes one of the peers of building 'uid' 
-            I run the next for loop in the range of all the agents:
-                IF an agent has the same unique_id as z i.e. I have found peer#1 of 'uid'
-                in the list of all agents then:
-                    if the intention of that peer#1 is 1, advance count of swn_with_solar.
-        Loop runs for all the peers which 'uid' has
+    def env_attitude(uid):#(self, uid, attitude):
+        """
+        To change the environmental attitude depending on the steps.
+        NOT TO BE CHANGED IN MODEL v1.0!
+        """
+        uid = uid
+        if agents_info.loc[uid]['MINERGIE'] == 1:
+            value = 0.95
+        else:
+            value = gauss(0.698,0.18)
+        if value > 1:
+            value = 1 #to keep it from going over 1
+        return value
+    
+    
+    def econ_attr(self):
+        """
+        To update the payback ratio every step
+        Takes data from the profitability_index pickle
+        """
+        uid = self.unique_id
+        try:
+            self.pp = profitability_index.loc[step_ctr][uid]
+        except KeyError:
+            self.pp = 0
         
-        THEN - swn_ratio is calculated as:
-            all peers in the swn with solar/all peers in the swn 
-    """
+        if self.pp < 0:
+            self.pp = 0
+            
+        return self.pp
     
-    for z in temp_list:
-        for y in range(len(agents_objects_list)): #checking all other agents in the simulation 
-            if agents_objects_list[y].unique_id == z:
-                #print("uid of peer = ",agents_objects_list[y].unique_id, "adopted solar = ", agents_objects_list[y].adopt_ind)
-                if agents_objects_list[y].adopt_ind == 1 or agents_objects_list[y].adopt_comm == 1: 
-                    swn_with_solar = swn_with_solar + 1
-    
-    
-    self.swn_ratio = (swn_with_solar/len(agents_peers.loc[:,self.unique_id]))
-                     
-def check_neighbours_subplots(self,uid):
-    """
-    Checks how many other agents in the --subplot = NEIGHBOURS-- have INTENTION/IDEA of installing solar
-    sets agent attribute subplot_effect (self.subplot_effect) accordingly
-    **WORKING WITH INTENTION as this is subplot peers**
-    Uses:
-        agents_subplots (it is a DataFrame) - list of all agents in the subplot of each building
-    """
-    if uid in agents_subplots.columns:
-        temp_list_subplots = agents_subplots[uid].dropna().values.tolist()
+    def check_peers(self,uid):
+        """
+        Checks how many other agents (or peers) in the SWN have installed solar
+        sets agent attribute swn_ratio (self.swn_ratio) accordingly
+        
+        Uses:
+            agents_peers (it is a DataFrame) - list of all people in the SWN of each building
+        """
+        swn_with_solar = 0
+        temp_list = []
+        temp_list = agents_peers[uid].values.tolist() #make a list of all peers of that particular agent with uid
         
         """
         Explanation of the for loops coming ahead:
             each agent considered by referencing its self.unique_id (or uid)
-            for z in temp_list_subplots() --> z becomes one of the peers of building 'uid' 
-                IF a neighbour has positive intention then:
-                    advance subplot_effect_counter.
-            Loop runs for all the neighbours which 'uid' has
+            for z in temp_list() --> z becomes one of the peers of building 'uid' 
+                I run the next for loop in the range of all the agents:
+                    IF an agent has the same unique_id as z i.e. I have found peer#1 of 'uid'
+                    in the list of all agents then:
+                        if the intention of that peer#1 is 1, advance count of swn_with_solar.
+            Loop runs for all the peers which 'uid' has
             
-            THEN - subplot_effect is calculated as:
-                all neighbours with positive intention/all neighoburs
+            THEN - swn_ratio is calculated as:
+                all peers in the swn with solar/all peers in the swn 
         """
         
-        subplot_effect_counter = 0      #initialize the counter to 0. This is to see how many of subplot neighbouts in total have intented to adopt solar this year
-        
-        
-        for z in temp_list_subplots:
-            for y in range(len(agents_objects_list)):
+        for z in temp_list:
+            for y in range(len(agents_objects_list)): #checking all other agents in the simulation 
                 if agents_objects_list[y].unique_id == z:
-                    #print("bldg considered = ",uid, "intention of neighbour ", z, "is = ",agents_objects_list[y].intention)
-                    if (agents_objects_list[y].intention == 1 and agents_objects_list[y].counter == 1):
-                        #print("~~bldg considered = ",uid, "intention of neighbour ", z, "is = ",agents_objects_list[y].intention)
-                        subplot_effect_counter += 1
-            
-        self.subplot_effect = (subplot_effect_counter/len(temp_list_subplots)) 
+                    #print("uid of peer = ",agents_objects_list[y].unique_id, "adopted solar = ", agents_objects_list[y].adopt_ind)
+                    if agents_objects_list[y].adopt_ind == 1 or agents_objects_list[y].adopt_comm == 1: 
+                        swn_with_solar = swn_with_solar + 1
         
+        
+        self.swn_ratio = (swn_with_solar/len(agents_peers.loc[:,self.unique_id]))
+                         
+    def check_neighbours_subplots(self,uid):
+        """
+        Checks how many other agents in the --subplot = NEIGHBOURS-- have INTENTION/IDEA of installing solar
+        sets agent attribute subplot_effect (self.subplot_effect) accordingly
+        **WORKING WITH INTENTION as this is subplot peers**
+        Uses:
+            agents_subplots (it is a DataFrame) - list of all agents in the subplot of each building
+        """
+        if uid in agents_subplots.columns:
+            temp_list_subplots = agents_subplots[uid].dropna().values.tolist()
+            
+            """
+            Explanation of the for loops coming ahead:
+                each agent considered by referencing its self.unique_id (or uid)
+                for z in temp_list_subplots() --> z becomes one of the peers of building 'uid' 
+                    IF a neighbour has positive intention then:
+                        advance subplot_effect_counter.
+                Loop runs for all the neighbours which 'uid' has
+                
+                THEN - subplot_effect is calculated as:
+                    all neighbours with positive intention/all neighoburs
+            """
+            
+            subplot_effect_counter = 0      #initialize the counter to 0. This is to see how many of subplot neighbouts in total have intented to adopt solar this year
+            
+            
+            for z in temp_list_subplots:
+                for y in range(len(agents_objects_list)):
+                    if agents_objects_list[y].unique_id == z:
+                        #print("bldg considered = ",uid, "intention of neighbour ", z, "is = ",agents_objects_list[y].intention)
+                        if (agents_objects_list[y].intention == 1 and agents_objects_list[y].counter == 1):
+                            #print("~~bldg considered = ",uid, "intention of neighbour ", z, "is = ",agents_objects_list[y].intention)
+                            subplot_effect_counter += 1
+                
+            self.subplot_effect = (subplot_effect_counter/len(temp_list_subplots)) 
+            
     
  
 #%% STAGES of the ABM
@@ -694,7 +724,7 @@ def stage1_intention(self, uid, attitude, pp,ratio,subplot_effect):
 
     #weights and thresholds for the intention function
     if scenario == "ZEV" or scenario == "no_ZEV":
-        dddd = 9
+        d = 8
         #print('stage1')
         #w_econ      = 0.30
         #w_swn       = 0.31
@@ -702,7 +732,7 @@ def stage1_intention(self, uid, attitude, pp,ratio,subplot_effect):
         #w_subplot   = 0.1
         #threshold   = 0.5
     elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
-        dddd = 9
+        d = 8
         #print('stage1')
         #w_econ      = 0.33
         #w_swn       = 0.42
