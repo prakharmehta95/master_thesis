@@ -15,6 +15,7 @@ from __main__ import ewz_low_large      #= 5/100 #CHF per kWh
 from __main__ import ewz_high_small     #= 24.3/100 #CHF per kWh
 from __main__ import ewz_low_small      #= 14.4/100 #CHF per kWh
 from __main__ import ewz_solarsplit_fee #= 4/100 #CHF per kWH      
+from __main__ import diff_prices        #if = 1, then both wholesale and retail prices are applied where appropriate. Else, all retail prices
 
 #PV Panel Properties
 from __main__ import PV_lifetime    #= 25 #years
@@ -277,15 +278,18 @@ for year in range(PV_lifetime):
         list_selfcons_LOW =  df_LOW.loc [df_LOW[i + '_PV-dem'] < 0 , i + '_solar']
         sum_selfcons_LOW = sum(list_selfcons_LOW)
         
-        #wholesale or retail electricity pricing
-        if agents_info.loc[i]['GRID_MWhyr'] >=100:
-            ewz_high = ewz_high_large#6/100 #CHF per kWh
-            ewz_low = ewz_low_large#5/100 #CHF per kWh
-        elif agents_info.loc[i]['GRID_MWhyr'] < 100:
-            ewz_high = ewz_high_small#24.3/100 #CHF per kWh
-            ewz_low = ewz_low_small#14.4/100 #CHF per kWh
         
-        
+        if diff_prices == 1:                    #wholesale or retail electricity pricing
+            if agents_info.loc[i]['GRID_MWhyr'] >=100:
+                ewz_high = ewz_high_large       #6/100 #CHF per kWh
+                ewz_low = ewz_low_large         #5/100 #CHF per kWh
+            elif agents_info.loc[i]['GRID_MWhyr'] < 100:
+                ewz_high = ewz_high_small       #24.3/100 #CHF per kWh
+                ewz_low = ewz_low_small         #14.4/100 #CHF per kWh
+        elif diff_prices == 0:                  #retail electricity pricing for all
+            ewz_high = ewz_high_small           #24.3/100 #CHF per kWh
+            ewz_low = ewz_low_small             #14.4/100 #CHF per kWh
+            
         savings = (sum_extraPV_HIGH*fit_high + sum_dem_selfcons_HIGH*ewz_high + sum_selfcons_HIGH * ewz_high +
                    sum_extraPV_LOW*fit_low   + sum_dem_selfcons_LOW*ewz_low   + sum_selfcons_LOW * ewz_low)
         #print(savings)

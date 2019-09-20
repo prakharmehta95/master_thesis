@@ -63,12 +63,13 @@ ewz_low_large       = 5/100     #CHF per kWh
 ewz_high_small      = 24.3/100  #CHF per kWh
 ewz_low_small       = 14.4/100  #CHF per kWh
 ewz_solarsplit_fee  = 4/100     #CHF per kWH      
+diff_prices         = 1         #if = 1, then both wholesale and retail prices are applied where appropriate. Else, all retail prices
 
 #PV Panel Properties
-PV_lifetime = 25        #years
-PV_degradation = 0.994  #(0.6% every year)
-OM_Cost_rate = 0.06     #CHF per kWh of solar PV production
-disc_rate = 0.05
+PV_lifetime         = 25        #years
+PV_degradation      = 0.994     #(0.6% every year)
+OM_Cost_rate        = 0.06      #CHF per kWh of solar PV production
+disc_rate           = 0.05
 
 import NPV_Calculation #runs the NPV calculation code and calculates individual NPVs for the agents involved
 
