@@ -31,7 +31,7 @@ for i in list(subplots_final.columns):
         for k in range(len(temp_combos_list)):
             for m in temp_combos_list[k]:
                 temp_name= i #take name of building here
-                temp_df_dem = df_demand[i]
+                temp_df_dem = df_demand[i] #from NPV_Calculation code
                 temp_df_solar = df_solar_AC[i]
                 #print('m = ',m)
                 for n in m:
@@ -45,12 +45,8 @@ for i in list(subplots_final.columns):
                 subplot_combos_solar[temp_name] = temp_df_solar
             
             
-#% saving the community combinations in csv - STUPID IDEA - EXCEL CAN'T HANDLE BASIC SHIT!
-#subplot_combos_dem.to_csv(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\Communities_Demands.csv')
-#subplot_combos_solar.to_csv(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\Communities_Solar.csv')
 
 #% saving community combinbations in a pickle
-                
 subplot_combos_dem.to_pickle('Community_TOP4_Combos_Demand.pickle')
 subplot_combos_solar.to_pickle('Community_TOP4_Combos_Solar.pickle')
 

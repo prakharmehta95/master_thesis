@@ -14,21 +14,21 @@ import pandas as pd
 
 
 
-agent_areas = pd.read_excel(r'C:\Users\prakh\OneDrive - ETHZ\RA_SusTec\CEA_Disaggregation\Codes\Excel_Databases\Building_Data\LIST_AGENTS_FINAL.xlsx')
+agent_areas = pd.read_excel(r'C:\Users\iA\OneDrive - ETHZ\RA_SusTec\CEA_Disaggregation\Codes\Excel_Databases\Building_Data\LIST_AGENTS_FINAL.xlsx')
 agent_list_final = list(agent_areas.Bldg_IDs)
 agent_areas = agent_areas.set_index("Bldg_IDs")
 
-og_bldg_stock = pd.read_excel(r'C:\Users\prakh\OneDrive - ETHZ\RA_SusTec\CEA_Disaggregation\Codes\Excel_Databases\Building_Data\OG_Wdkon_Bldg_Stock_Stats.xlsx')
+og_bldg_stock = pd.read_excel(r'C:\Users\iA\OneDrive - ETHZ\RA_SusTec\CEA_Disaggregation\Codes\Excel_Databases\Building_Data\OG_Wdkon_Bldg_Stock_Stats.xlsx')
 og_bldg_stock = og_bldg_stock.set_index("EGID")
 #og_bldg_stock.index = og_bldg_stock.index.map(str)
-zones_splits =  pd.read_excel(r'C:\Users\prakh\OneDrive - ETHZ\RA_SusTec\CEA_Disaggregation\Codes\Excel_Databases\Building_Data\Buildings_EGIDs_Each_zone_v1.xlsx')
+zones_splits =  pd.read_excel(r'C:\Users\iA\OneDrive - ETHZ\RA_SusTec\CEA_Disaggregation\Codes\Excel_Databases\Building_Data\Buildings_EGIDs_Each_zone_v1.xlsx')
 
 
 #%%
 df_PV = pd.DataFrame(data = None)
 for FileList in agent_list_final:
     print(FileList)
-    zz = pd.read_csv(r"C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\CEA Data\Sample 1650\outputs\data\potentials\solar\\" + FileList + '_PV.csv')
+    zz = pd.read_csv(r"C:\Users\iA\Documents\CEA_Wiedikon\sample_1650\baseline\outputs\data\potentials\solar\\" + FileList + '_PV.csv')
     df_PV[FileList] = zz.E_PV_gen_kWh
  
 
@@ -86,4 +86,4 @@ for zone in agent_list_final:
         disagg_PV_df[temp_bldg_name]    = df_PV[zone]*bldgarea/cea_roof_area
         
 
-
+disagg_PV_df.to_pickle('Disaggregated_PV.pickle')

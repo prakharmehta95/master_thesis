@@ -21,34 +21,58 @@ import pickle
 """
 define all parameters here
 """
+#scenario = "ZEV"                       #100% size, 100 MWh Restriction on buildings, 100 MWh Community Restriction
+#scenario = "no_ZEV"                    #100% size, 100 MWh Restriction, Communities cannot be formed
+scenario = "TOP4_no100MWh_retail"       #100% size, no 100 MWh Restriction BUT max 4 neighbours to form a community with
+#scenario = "TOP4_no100MWh_wholesale"   #100% size, no 100 MWh Restriction BUT max 4 neighbours to form a community with WHOLESALE prices
 
-scenario = "TOP4_no100MWh_retail"
 
-
+if scenario == "ZEV" or scenario == "no_ZEV":
+    w_econ      = 0.30
+    w_swn       = 0.31
+    w_att       = 0.39
+    w_subplot   = 0.1
+    threshold   = 0.5
+    reduction   = -0.05
+    comm_limit  = 1      #limit of 100 MWh for community size applies
+    ZEV         = 0     #default - ZEV formation not allowed (no_ZEV scenario). See next IF statement for the ZEV scenario
+    if scenario == "ZEV":
+        ZEV = 1             #binary variable to turn on/off whether to allow community formation
+    
+elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
+    w_econ      = 0.33
+    w_swn       = 0.42
+    w_att       = 0.25 
+    w_subplot   = 0.1
+    threshold   = 0.5
+    reduction   = -0.0
+    ZEV = 1            # communities can be formed
+    comm_limit = 0      #no 100 MWh limit for community size
+   
 #%%
 """
 NPV Calculation call from here - calculates the NPVs of individual buildings
 """
 #define the costs etc here which are read in the NPV_Calculation file:::
 
-PV_price_baseline   = pd.read_excel(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data\Solar PV Cost Projections\PV_Prices.xlsx')
-fit_high            = 8.5/100 #CHF per kWH
-fit_low             = 4.45/100 #CHF per kWH
-ewz_high_large      = 6/100 #CHF per kWh
-ewz_low_large       = 5/100 #CHF per kWh
-ewz_high_small      = 24.3/100 #CHF per kWh
-ewz_low_small       = 14.4/100 #CHF per kWh
-ewz_solarsplit_fee  = 4/100 #CHF per kWH      
+PV_price_baseline   = pd.read_excel(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data\Solar PV Cost Projections\PV_Prices.xlsx')
+fit_high            = 8.5/100   #CHF per kWH
+fit_low             = 4.45/100  #CHF per kWH
+ewz_high_large      = 6/100     #CHF per kWh
+ewz_low_large       = 5/100     #CHF per kWh
+ewz_high_small      = 24.3/100  #CHF per kWh
+ewz_low_small       = 14.4/100  #CHF per kWh
+ewz_solarsplit_fee  = 4/100     #CHF per kWH      
 
 #PV Panel Properties
-PV_lifetime = 25 #years
-PV_degradation = 0.994 #(0.6% every year)
-OM_Cost_rate = 0.06 # CHF per kWh of solar PV production
+PV_lifetime = 25        #years
+PV_degradation = 0.994  #(0.6% every year)
+OM_Cost_rate = 0.06     #CHF per kWh of solar PV production
 disc_rate = 0.05
 
-import NPV_Calculation
+import NPV_Calculation #runs the NPV calculation code and calculates individual NPVs for the agents involved
 
-#from NPV_Calculation import PV_lifetime_double as pv_life_double
+from NPV_Calculation import PV_lifetime_double as pv_life_double
 from NPV_Calculation import Agents_NPVs as Agents_Ind_NPVs
 from NPV_Calculation import Agents_SCRs as Agents_Ind_SCRs
 from NPV_Calculation import Agents_Investment_Costs as Agents_Ind_Investments
@@ -60,14 +84,14 @@ from NPV_Calculation import Agents_Investment_Costs as Agents_Ind_Investments
 Agent information read from excel, pickles etc...
 """
 
-#check what info to load!
+#check what info to load! - this will change (as of 11/09)
 if scenario == "ZEV" or scenario == "no_ZEV":
     agents_info = pd.read_excel(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_lessthan100MWh_100%PV.xlsx')
 elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
-    agents_info = pd.read_excel(r"C:\\Users\\prakh\\OneDrive - ETHZ\\Thesis\\PM\\Data_Prep_ABM\\Skeleton_Updated_No_100MWh_Restriction.xlsx")
+    agents_info = pd.read_excel(r"C:\\Users\\iA\\OneDrive - ETHZ\\Thesis\\PM\\Data_Prep_ABM\\Skeleton_Updated_No_100MWh_Restriction.xlsx")
 
 #check this!
-agent_list_final = pd.read_excel(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\LIST_AGENTS_FINAL.xlsx')
+agent_list_final = pd.read_excel(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\LIST_AGENTS_FINAL.xlsx')
 
 #%%
 number = 1437   #number of agents

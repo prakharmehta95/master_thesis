@@ -91,41 +91,7 @@ Prob_Use_Monthly= Prob_Use_Monthly.set_index('Months')
 
   
 
-#%% useless section
-for i in ['Z0003']:#,'Z0005']:#agent_list_final:
-    temp_zone_splits = zones_splits[i].dropna()   
-       
-    temp_df = og_bldg_stock.loc[temp_zone_splits,:]
-    list_egids = temp_df.index.tolist()
-    
-    sum_nutzflache_area = temp_df.sum(skipna = True)
-    
-    kkk = sum_nutzflache_area.Nutzflache
-        
-    cea_area = agent_areas.loc[i]['Af_m2']
-    temp_df['Area_CEA'] = ""
-    temp_areas_list = []
-    
-    for j in list_egids:
-        area_prop_cea = (temp_df.loc[j]['Nutzflache']/kkk)*cea_area
-        temp_areas_list.append(area_prop_cea)
-                
-    temp_df['Area_CEA'] = temp_areas_list
-    temp_df['CEA_Type'] = ""
-    temp_bldg_type_list = []
-    for j in list_egids:
-        temp_bldg_type = temp_df.loc[j]['GdbArt1N']
-        temp_bldg_type = key_xfmn_bldgtype.loc[temp_bldg_type]['CEA']
-        temp_bldg_type_list.append(temp_bldg_type)
-        
-    temp_df['CEA_Type'] = temp_bldg_type_list
-    
-#    for j in temp_zone_splits:
- #       print(j)
-  
-
-
-    
+   
 #%% calculate power densities times probabilities for every hour of the year for every building type
 
 def daterange(start_date, end_date):
@@ -285,6 +251,7 @@ for zone in agent_list_final:#['Z1757']:#['Z1753','Z1754','Z1755','Z1756','Z1757
     disagg_wtdsum_cool_df = pd.DataFrame(data = None)
     sum_total_Esys = 0
     sum_totalwtdsum_Ecool = 0
+    
     #loop over bldgs
     for bldg in list_egids:
         #print(bldg)
@@ -327,24 +294,26 @@ for zone in agent_list_final:#['Z1757']:#['Z1753','Z1754','Z1755','Z1756','Z1757
     disagg_cool_ratios = pd.DataFrame(data = None)
     for bldg in list_egids:
         #print(bldg)
-        bldgname = str(bldg)
+        bldgname = 'B' + str(bldg)
         temp_ratio_name = 'ratio_' + bldgname
         temp_total_Esys_name = 'total_' + bldgname
-        disagg_elec_ratios[bldg] = ""
-        disagg_elec_ratios[bldg] = disagg_df[temp_total_Esys_name]/disagg_df['total_Esys_disagg']
+        disagg_elec_ratios[bldgname] = ""
+        disagg_elec_ratios[bldgname] = disagg_df[temp_total_Esys_name]/disagg_df['total_Esys_disagg']
         disagg_elec_ratios = disagg_elec_ratios.fillna(0)
-        disagg_CEA_elec_final[bldg] = ""
-        disagg_CEA_elec_final[bldg] = disagg_elec_ratios[bldg]*df_demand_sys[zone]
+        disagg_CEA_elec_final[bldgname] = ""
+        disagg_CEA_elec_final[bldgname] = disagg_elec_ratios[bldgname]*df_demand_sys[zone]
     
         #COOLING------
-        disagg_cool_ratios[bldg] = ""
-        disagg_cool_ratios[bldg] = disagg_wtdsum_cool_df[bldgname]/disagg_wtdsum_cool_df['total_Ecool_wtdsum']
+        disagg_cool_ratios[bldgname] = ""
+        disagg_cool_ratios[bldgname] = disagg_wtdsum_cool_df[bldgname]/disagg_wtdsum_cool_df['total_Ecool_wtdsum']
         disagg_cool_ratios = disagg_cool_ratios.fillna(0)
-        disagg_CEA_cool_final[bldg] = ""
-        disagg_CEA_cool_final[bldg] = disagg_cool_ratios[bldg]*has_cooling[bldg]*df_demand_cool[zone]
+        disagg_CEA_cool_final[bldgname] = ""
+        disagg_CEA_cool_final[bldgname] = disagg_cool_ratios[bldgname]*has_cooling[bldg]*df_demand_cool[zone]
     
 #disagg_CEA_final.to_excel(r'C:\Users\iA\OneDrive - ETHZ\RA_SusTec\CEA_Disaggregation\Codes\CEA_Disaggregated_E_sys.xlsx')    
-#disagg_CEA_final.to_pickle(r'C:\Users\iA\OneDrive - ETHZ\RA_SusTec\CEA_Disaggregation\Codes\CEA_Disaggregated_E_sys.pickle')
+
+#disagg_CEA_elec_final.to_pickle(r'C:\Users\iA\OneDrive - ETHZ\RA_SusTec\CEA_Disaggregation\Codes\CEA_Disaggregated_E_sys.pickle')
+#disagg_CEA_cool_final.to_pickle(r'C:\Users\iA\OneDrive - ETHZ\RA_SusTec\CEA_Disaggregation\Codes\CEA_Disaggregated_E_sys.pickle')
     
     
     

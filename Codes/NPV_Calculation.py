@@ -8,23 +8,23 @@ Created on Tue Apr  9 18:45:09 2019
 
 #Price Levels
 from __main__ import PV_price_baseline
-from __main__ import fit_high #= 8.5/100 #CHF per kWH
-from __main__ import fit_low #=  4.45/100 #CHF per kWH
-from __main__ import ewz_high_large#6/100 #CHF per kWh
-from __main__ import ewz_low_large#5/100 #CHF per kWh
-from __main__ import ewz_high_small#24.3/100 #CHF per kWh
-from __main__ import ewz_low_small#14.4/100 #CHF per kWh
+from __main__ import fit_high           #= 8.5/100 #CHF per kWH
+from __main__ import fit_low            #= 4.45/100 #CHF per kWH
+from __main__ import ewz_high_large     #= 6/100 #CHF per kWh
+from __main__ import ewz_low_large      #= 5/100 #CHF per kWh
+from __main__ import ewz_high_small     #= 24.3/100 #CHF per kWh
+from __main__ import ewz_low_small      #= 14.4/100 #CHF per kWh
 from __main__ import ewz_solarsplit_fee #= 4/100 #CHF per kWH      
 
 #PV Panel Properties
-from __main__ import PV_lifetime #= 25 #years
+from __main__ import PV_lifetime    #= 25 #years
 from __main__ import PV_degradation #= 0.994 #(0.6% every year)
-from __main__ import OM_Cost_rate #= 0.06 # CHF per kWh of solar PV production
-from __main__ import disc_rate
+from __main__ import OM_Cost_rate   #= 0.06 # CHF per kWh of solar PV production
+from __main__ import disc_rate      #= 0.05 or 5%
 
 #Agent information
 from __main__ import agents_info
-from __main__ import agents_list_final
+from __main__ import agent_list_final
 
 #%%
 import pandas as pd
@@ -43,34 +43,34 @@ import pandas as pd
 #agent_list_final = pd.read_excel(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\LIST_AGENTS_FINAL.xlsx')
 
 agent_list_final = list(agent_list_final.Bldg_IDs)
-agent_list_final = ['Z0003','Z0004']
+#agent_list_final = ['Z0003','Z0004']
 
 df_solar = pd.DataFrame(data = None)
 for FileList in agent_list_final:
     print(FileList)
-    #path = r."C:\\Users\\iA\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\solar\\"
-    z = pd.read_csv(r"C:\\Users\\prakh\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\solar\\" + FileList + '_PV.csv')
+    path_pv = "C:\\Users\\iA\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\solar\\"
+    z = pd.read_csv(path_pv + FileList + '_PV.csv')
     df_solar[FileList] = ""
     df_solar[FileList] = z.E_PV_gen_kWh
  
 ##%% import demands
-#     
+     
 df_demand = pd.DataFrame(data = None)
 for FileList in agent_list_final:
     print(FileList)
-    zz = pd.read_csv(r"C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\CEA Data\Sample 1650\outputs\data\demand\\" + FileList + '.csv')
+    path_dem = r"C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\CEA Data\Sample 1650\outputs\data\demand\"
+    zz = pd.read_csv(path_dem + FileList + '.csv')
     df_demand[FileList] = ""
     df_demand[FileList] = zz.GRID_kWh
 
 #%% CORRECTION FOR SOLAR because of the CEA geometry ussue
 correct_solar = pd.read_excel(r"C:\\Users\\prakh\\OneDrive - ETHZ\\Thesis\\PM\\CEA Data\\Sample 1650\\outputs\\data\\potentials\\PV_Corrected_RednFactors.xlsx")
-
 temp_list = list(correct_solar.columns)
 
 for i in temp_list:
     df_solar[i] = correct_solar[i]
 
-# =============================================================================
+
 #%% multiply the solar PV data with an efficiency factor to convert to AC
 #commented out to avoid execution by mistake
 

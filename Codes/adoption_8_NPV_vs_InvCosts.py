@@ -7,15 +7,18 @@ Created on Thu Apr  4 17:58:04 2019
 
 #%%
 """
-Initial libraries and data import
+Initial libraries and data import from the run_adoption_loop file
 """
 from __main__ import *
-print(scenario)
-print(npvvvvv.columns)
-ccc = npvvvvv.Z0003
-print(ccc)
+#print(npvvvvv.columns)
+#ccc = npvvvvv.Z0003
+#print(ccc)
+
+
 #%%
-#useful packages to work with
+'''
+useful packages to work with
+'''
 import random 
 import itertools
 from random import seed
@@ -32,21 +35,6 @@ from Scheduler_StagedActivation_Random import StagedActivation_random
 from mesa.datacollection import DataCollector #for data collection, of course
 
 #%%
-"""
-Individual NPV Calculation
-Call another python file and pass new scenario prices etc. from here
-"""
-
-#import NPV_Calculation
-
-#NPV_Calculation.set_arguments('pass arguments here')
-#def scenario_args():
-    
-
-
-
-
-#%%
 # =============================================================================
 #SCENARIO SETTING
 
@@ -54,49 +42,16 @@ Call another python file and pass new scenario prices etc. from here
 #scenario = "no_ZEV"
 #scenario = "TOP4_no100MWh_retail"
 #scenario = "TOP4_no100MWh_wholesale"
-#scenario = 2 #no 100MWh criteria but max 4 neighbours considered in forming the communities
-#scenario = 'laptop_top4'
+
 print(scenario)
     
-if scenario == "ZEV":
+if scenario == "ZEV" or scenario == "no_ZEV":
     '''
     100% size, 100 MWh Restriction on buildings, 100 MWh Community Restriction
     '''
     #INFORMATION on agents and all combinations
-    data = pd.read_excel(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_lessthan100MWh_100%PV.xlsx')
-    
-    #list of all possible subplots i.e. neighbours to form a community with
-    subplots_final = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\subplots_CLEAN_100MWh.xlsx') 
-    
-    #profitability index for individual agents
-    profitability_index = pd.read_pickle(r"C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Profitability_Index_SCALED_less_than_100MWh_Demand.pickle")
-    
-    #NPV information
-    Agents_Ind_NPVs = pd.read_pickle('Agents_IND_nosubsidy_NPVs_Years.pickle')
-    Agents_Community_NPVs = pd.read_pickle('Duplicate_Combos_nosubsidy_Agents_NPVs_Years.pickle')
-    Agents_Ind_SCRs = pd.read_pickle('Agents_IND_nosubsidy_SCR_Years.pickle')
-    Agents_Community_SCRs = pd.read_pickle('Duplicate_Combos_nosubsidy_Agents_SCRs_Years.pickle')
-    Agents_Ind_Investments = pd.read_pickle('Agents_IND_nosubsidy_InvestmentCosts_Years.pickle')
-    
-    ZEV = 1             #binary variable to turn on/off whether to have ZEV/no ZEV
-    comm_limit = 1      #limit of 100 MWh for community size applies
-    
-    w_econ      = 0.30
-    w_swn       = 0.31
-    w_att       = 0.39
-    w_subplot   = 0.1
-    threshold   = 0.5
-    
-    reduction = -0.05
-    
-elif scenario == "no_ZEV":
-    '''
-    100% size, 100 MWh Restriction, Communities cannot be formed
-    '''
-    #INFORMATION on agents and all combinations
-    data = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_lessthan100MWh_100%PV.xlsx')
+    agents_info = pd.read_excel(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_lessthan100MWh_100%PV.xlsx')
     Agents_Possibles_Combos = pd.read_pickle('Duplicate_Combinations_All_Info_commIDs.pickle')
-    
     #list of all possible subplots i.e. neighbours to form a community with
     subplots_final = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\subplots_CLEAN_100MWh.xlsx') 
     
@@ -109,27 +64,16 @@ elif scenario == "no_ZEV":
     Agents_Ind_SCRs = pd.read_pickle('Agents_IND_nosubsidy_SCR_Years.pickle')
     Agents_Community_SCRs = pd.read_pickle('Duplicate_Combos_nosubsidy_Agents_SCRs_Years.pickle')
     Agents_Ind_Investments = pd.read_pickle('Agents_IND_nosubsidy_InvestmentCosts_Years.pickle')
-    ZEV = 0 #community can't even be formed
-    comm_limit = 1 #just to be consistent with code, this won't be used as ZEV = 0 for this scenario
     
-    w_econ      = 0.30
-    w_swn       = 0.31
-    w_att       = 0.39
-    w_subplot   = 0.1
-    threshold   = 0.5
-    reduction = -0.05
     
-elif scenario == "TOP4_no100MWh_retail":
+elif scenario == "TOP4_no100MWh_retail" or scenario == "TOP4_no100MWh_wholesale":
     '''
     100% size, no 100 MWh Restriction BUT max 4 neighbours to form a community with
     '''
     
     #INFORMATION on agents and all combinations
-    #data = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_No_100MWh_Restriction.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
-    #Agents_Possibles_Combos = pd.read_pickle(r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combinations_TOP4_All_Info_commIDs.pickle')
-    data = pd.read_excel (r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_No_100MWh_Restriction.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
+    agents_info = pd.read_excel (r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_No_100MWh_Restriction.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
     Agents_Possibles_Combos = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combinations_TOP4_All_Info_commIDs.pickle')
-    
     Agents_Possibles_Combos = Agents_Possibles_Combos.rename(index=str, columns={"Unnamed: 0": "Name_Comm",})
     Agents_Possibles_Combos = Agents_Possibles_Combos.set_index('Name_Comm')
     
@@ -137,58 +81,22 @@ elif scenario == "TOP4_no100MWh_retail":
     subplots_final = pd.read_excel (r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\subplots_CLEAN_100MWh_TOP4.xlsx') 
     
     #profitability index for individual agents
-    profitability_index = pd.read_pickle(r"C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Profitability_Index_Scaled.pickle")
-       
-    #NPV information
-    Agents_Ind_NPVs = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Agents_IND_nosubsidy_NPVs_Years.pickle')
-    Agents_Community_NPVs = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combos_TOP4_nosubsidy_Agents_NPVs_Years.pickle')
+    if scenario == "TOP4_no100MWh_retail":
+        profitability_index = pd.read_pickle(r"C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Profitability_Index_Scaled.pickle")
+        Agents_Ind_NPVs = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Agents_IND_nosubsidy_NPVs_Years.pickle')
+        Agents_Community_NPVs = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combos_TOP4_nosubsidy_Agents_NPVs_Years.pickle')
+    elif scenario == "TOP4_no100MWh_wholesale":
+        profitability_index = pd.read_pickle(r"C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Profitability_Index_SCALED_wholesale.pickle")
+        Agents_Ind_NPVs = pd.read_pickle('Agents_IND_wholesale_nosubsidy_NPVs_Years.pickle')
+        Agents_Community_NPVs = pd.read_pickle('Duplicate_Combos_TOP4_wholesale_nosubsidy_Agents_NPVs_Years.pickle')
+    
+    #SCR and Investment Info
     Agents_Ind_SCRs = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Agents_IND_nosubsidy_SCR_Years.pickle')
     Agents_Community_SCRs = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Duplicate_Combos_TOP4_nosubsidy_Agents_SCRs.pickle')
     Agents_Ind_Investments = pd.read_pickle(r'C:\Users\prakh\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Agents_IND_nosubsidy_InvestmentCosts_Years.pickle')
-    
-    ZEV = 1 # communities can be formed
-    comm_limit = 0 #no 100 MWh limit for community size
-    w_econ      = 0.33
-    w_swn       = 0.42
-    w_att       = 0.25 
-    w_subplot   = 0.1
-    threshold   = 0.5
-    reduction = -0.0
-    
-elif scenario == "TOP4_no100MWh_wholesale":
-    '''
-    100% size, no 100 MWh Restriction BUT max 4 neighbours to form a community with. WHOLESALE prices
-    '''
-    
-    #INFORMATION on agents and all combinations
-    data = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Skeleton_Updated_No_100MWh_Restriction.xlsx')#test_agents_skeleton.xlsx') #for an earlier version of Excel, you may need to use the file extension of 'xls'
-    Agents_Possibles_Combos = pd.read_pickle('Duplicate_Combinations_TOP4_All_Info_commIDs.pickle')
-    Agents_Possibles_Combos = Agents_Possibles_Combos.rename(index=str, columns={"Unnamed: 0": "Name_Comm",})
-    Agents_Possibles_Combos = Agents_Possibles_Combos.set_index('Name_Comm')
-    
-    #list of all possible subplots i.e. neighbours to form a community with
-    subplots_final = pd.read_excel (r'C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Data_Prep_ABM\Subplots_Communities\1436 Buildings\subplots_CLEAN_100MWh_TOP4.xlsx') 
-    
-    #profitability index for individual agents
-    profitability_index = pd.read_pickle(r"C:\Users\iA\OneDrive - ETHZ\Thesis\PM\Codes\ABM\MasterThesis_PM\masterthesis\TPB\Profitability_Index_SCALED_wholesale.pickle")
-       
-    #NPV information
-    Agents_Ind_NPVs = pd.read_pickle('Agents_IND_wholesale_nosubsidy_NPVs_Years.pickle')
-    Agents_Community_NPVs = pd.read_pickle('Duplicate_Combos_TOP4_wholesale_nosubsidy_Agents_NPVs_Years.pickle')
-    Agents_Ind_SCRs = pd.read_pickle('Agents_IND_nosubsidy_SCR_Years.pickle')
-    Agents_Community_SCRs = pd.read_pickle('Duplicate_Combos_TOP4_nosubsidy_Agents_SCRs.pickle')
-    Agents_Ind_Investments = pd.read_pickle('Agents_IND_nosubsidy_InvestmentCosts_Years.pickle')
-    
-    ZEV = 1 # communities can be formed
-    comm_limit = 0 #no 100 MWh limit for community size
-    
-    w_econ      = 0.33
-    w_swn       = 0.42
-    w_att       = 0.25 
-    w_subplot   = 0.1
-    threshold   = 0.5
-    reduction = -0.0
 
+    
+    
 
 # =============================================================================
 # AGENT INFORMATION
@@ -200,22 +108,21 @@ list_installed_solar_bldgs_ALL      = ['Z0115', 'Z0360', 'Z0398', 'Z0401',
                                        'Z0402', 'Z0691', 'Z1565', 'Z1717',
                                        'Z1719', 'Z1720', 'Z1721' ] 
 
-agents_info = data  #just a copy of original data, used to store all information of agents
+
 agents_info['intention'] = 0
 agents_info['Comm_NPV'] = 0
 agents_info['Ind_NPV'] = 0
-agents_info['IDs'] = ""
-agents_info['IDs'] = agents_info['bldg_id']
 agents_info['Reason'] = ""
-agents_info = agents_info.set_index('bldg_id')
 agents_info['Ind_SCR'] = 0
 agents_info['Comm_SCR'] = 0
-
 agents_info['Adopt_IND'] = 0        #saves 1 if INDIVIDUAL adoption occurs, else stays 0
 agents_info['Adopt_COMM'] = 0       #saves 1 if COMMUNITY  adoption occurs, else stays 0
-agents_info['Community_ID'] = ""    #community ID of the community formed
 agents_info['En_Champ'] = 0         #saves who is the energy champion of that community
 agents_info['Year'] = 0             #saves year of adoption
+agents_info['Community_ID'] = ""    #community ID of the community formed
+agents_info['IDs'] = ""
+agents_info['IDs'] = agents_info['bldg_id']
+agents_info = agents_info.set_index('bldg_id')
 
 agents_subplots = subplots_final
 
@@ -724,7 +631,7 @@ def stage1_intention(self, uid, attitude, pp,ratio,subplot_effect):
 
     #weights and thresholds for the intention function
     if scenario == "ZEV" or scenario == "no_ZEV":
-        d = 8
+        d = 8 #random placeholder at the moment. All of these initializations have been moved to the top of this code as of 11/09
         #print('stage1')
         #w_econ      = 0.30
         #w_swn       = 0.31
